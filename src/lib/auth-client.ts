@@ -1,7 +1,9 @@
-import { createAuthClient } from "better-auth/svelte";
+import { createAuthClient } from "better-auth/svelte"
+import { adminClient } from "better-auth/client/plugins"
 
 export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_BETTER_AUTH_URL ?? "http://localhost:5173",
-});
+  baseURL: typeof window !== 'undefined' ? window.location.origin : '',
+  plugins: [adminClient()],
+})
 
-export const { signIn, signOut, useSession } = authClient;
+export const { signIn, signOut, useSession } = authClient
