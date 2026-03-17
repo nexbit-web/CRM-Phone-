@@ -2,24 +2,29 @@
   import AppSidebar from '$lib/components/app-sidebar.svelte'
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
   import Header from '$lib/components/Header.svelte'
+  import { useSession } from '$lib/auth-client'
+  import { goto } from '$app/navigation'
+  import { onMount } from 'svelte'
 
   let { children } = $props()
 
-  const titles: Record<string, string> = {
-    '/dashboard': 'Дашборд',
-    '/orders': 'Замовлення',
-    '/orders/new': 'Нове замовлення',
-    '/catalog': 'Каталог',
-    '/day': 'Закрити день',
-    '/admin': 'Співробітники',
-  }
+  const session = useSession()
+
+  onMount(() => {
+    const unsubscribe = session.subscribe((s) => {
+      if (s.isPending) return
+      if (!s.data?.user) {
+        goto('/login', { replaceState: true })
+      }
+    })
+    return unsubscribe
+  })
 </script>
 
 <Sidebar.Provider>
   <AppSidebar />
   <Sidebar.Inset>
     <Header />
-
     <main class="p-6">
       {@render children()}
     </main>

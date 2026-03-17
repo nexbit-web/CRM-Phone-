@@ -13,8 +13,13 @@
   const sidebar = useSidebar()
 
   async function handleLogout() {
-    await signOut()
-    goto('/login')
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          goto('/login', { replaceState: true })
+        },
+      },
+    })
   }
 
   // Ініціали для аватара

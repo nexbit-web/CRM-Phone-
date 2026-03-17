@@ -36,9 +36,9 @@ async function main() {
 
   await auth.api.createUser({
     body: {
-      name: 'ппп',
+      name: 'Микита',
       email: 'nik@crm.com',
-      password: '123456',
+      password: 'qwertyuiop2000',
       role: 'admin',
     },
   })

@@ -26,9 +26,9 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   // Тільки OWNER може заходити в /admin
-  if (isAdminRoute && session?.user?.role !== 'admin') {
-    throw redirect(303, '/orders')
-  }
+ if (isAdminRoute && session?.user?.role !== 'admin') {
+  throw redirect(303, '/orders')
+}
 
   const response = await resolve(event)
 
