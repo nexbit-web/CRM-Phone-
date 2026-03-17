@@ -1,9 +1,10 @@
-import { PrismaClient } from "../src/generated/prisma/client"
-import { PrismaPg } from "@prisma/adapter-pg"
-import { betterAuth } from "better-auth"
-import { prismaAdapter } from "better-auth/adapters/prisma"
-import { admin } from "better-auth/plugins"
-import "dotenv/config"
+import 'dotenv/config'
+import { PrismaClient } from '../src/generated/prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { betterAuth } from 'better-auth'
+import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { admin } from 'better-auth/plugins'
+import 'dotenv/config'
 
 // npx prisma db seed
 
@@ -15,7 +16,7 @@ const prisma = new PrismaClient({ adapter })
 
 const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+    provider: 'postgresql',
   }),
   emailAndPassword: {
     enabled: true,
@@ -25,27 +26,27 @@ const auth = betterAuth({
 
 async function main() {
   const existing = await prisma.user.findFirst({
-    where: { role: "admin" },
+    where: { role: 'admin' },
   })
 
   if (existing) {
-    console.log("✅ Владелец уже существует:", existing.email)
+    console.log('✅ Владелец уже существует:', existing.email)
     return
   }
 
   await auth.api.createUser({
     body: {
-      name: "Микита",
-      email: "nik@crm.com",
-      password: "qwertyuiop2026",
-      role: "admin",
+      name: '',
+      email: '',
+      password: '',
+      role: 'admin',
     },
   })
 
-  console.log("✅ Владелец создан!")
-  console.log("   Email:  owner@crm.com")
-  console.log("   Пароль: password123")
-  console.log("⚠️  Смени пароль в /admin!")
+  console.log('✅ Владелец создан!')
+  console.log('   Email:  owner@crm.com')
+  console.log('   Пароль: password123')
+  console.log('⚠️  Смени пароль в /admin!')
 }
 
 main()
