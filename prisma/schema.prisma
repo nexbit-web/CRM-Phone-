@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+// npx prisma generate
+
+// ⚠️ Enum'ы должны быть объявлены ДО моделей которые их используют
+
+ 
+
+enum OrderStatus {
+  RECEIVED
+  IN_PROGRESS
+  READY
+  ISSUED
+}
+
+enum DeviceType {
+  PHONE
+  TABLET
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          String    @default("user")
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  sessions      Session[]
+  accounts      Account[]
+}
+
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token          String   @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Account {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  idToken           String?
+  password          String?   
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Brand {
+  id     String        @id @default(cuid())
+  name   String        @unique
+  models DeviceModel[]
+}
+
+model DeviceModel {
+  id      String     @id @default(cuid())
+  name    String
+  type    DeviceType
+  brandId String
+  brand   Brand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  parts   Part[]     @relation("ModelParts")
+  orders  Order[]
+}
+
+model Part {
+  id         String        @id @default(cuid())
+  name       String
+  price      Decimal       @db.Decimal(10, 2)
+  models     DeviceModel[] @relation("ModelParts")
+  orderItems OrderItem[]
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  createdAt    DateTime    @default(now())
+  status       OrderStatus @default(RECEIVED)
+  clientName   String
+  clientPhone  String
+  deviceId     String
+  device       DeviceModel @relation(fields: [deviceId], references: [id])
+  items        OrderItem[]
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  daySessionId String?
+  daySession   DaySession? @relation(fields: [daySessionId], references: [id])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  partId  String
+  part    Part   @relation(fields: [partId], references: [id])
+  qty     Int    @default(1)
+}
+
+model DaySession {
+  id       String    @id @default(cuid())
+  date     DateTime  @default(now())
+  closedAt DateTime?
+  sentToTg Boolean   @default(false)
+  orders   Order[]
+}
