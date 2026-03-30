@@ -51,7 +51,7 @@
       <!-- Форма -->
       <div class="p-8 flex flex-col justify-center">
         <div class="flex flex-col items-center gap-2 text-center mb-8">
-          <h1 class="text-2xl font-bold">CRM Ремонт Гаджетів</h1>
+          <h1 class="text-2xl font-bold">ProClean CRM</h1>
           <p class="text-muted-foreground text-sm">
             Введіть свої дані для входу
           </p>
@@ -115,9 +115,9 @@
       </div>
       <div class="bg-muted relative hidden md:block">
         <img
-          src="/placeholder.svg"
+          src="/login-img.jpg"
           alt="placeholder"
-          class="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          class="absolute inset-0 h-full w-full object-cover object-left dark:brightness-[0.9]  "
         />
       </div>
     </Card.Content>

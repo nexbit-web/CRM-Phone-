@@ -2,12 +2,12 @@
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
   import { page } from '$app/stores'
   import type { Component } from 'svelte'
-  import type { Icon } from '@lucide/svelte'
+  import type { IconProps } from '@lucide/svelte'
 
   type NavItem = {
     title: string
     url: string
-    icon: Component<Icon>
+    icon: Component<IconProps>
   }
 
   let { items }: { items: NavItem[] } = $props()

@@ -1,34 +1,44 @@
 <script lang="ts" module>
-  import PackagePlusIcon from '@lucide/svelte/icons/package-plus'
-  import ClipboardListIcon from '@lucide/svelte/icons/clipboard-list'
-  import WrenchIcon from '@lucide/svelte/icons/wrench'
-  import CalendarCheckIcon from '@lucide/svelte/icons/calendar-check'
-  import UsersIcon from '@lucide/svelte/icons/users'
+  import type { Component } from 'svelte'
+  import type { IconProps } from '@lucide/svelte'
+  import {
+    ClipboardList,
+    PackagePlus,
+    CalendarDays,
+    Contact,
+    Users,
+    Wallet,
+    Sparkles,
+    Settings,
+    ShieldUser,
+  } from '@lucide/svelte'
 
-  const navItems = [
-    { title: 'Замовлення', url: '/orders', icon: ClipboardListIcon },
-    { title: 'Нове замовлення', url: '/orders/new', icon: PackagePlusIcon },
-    { title: 'Каталог', url: '/catalog', icon: WrenchIcon },
-    { title: 'Закрити день', url: '/day', icon: CalendarCheckIcon },
-    { title: 'Співробітники', url: '/admin', icon: UsersIcon },
-  ]
-
-  const data = {
-    user: {
-      name: 'shadcn',
-      email: 'm@example.com',
-      avatar: '/avatars/shadcn.jpg',
-    },
+  type NavItem = {
+    title: string
+    url: string
+    icon: Component<IconProps>
   }
+
+  const navItems: NavItem[] = [
+    { title: 'Замовлення', url: '/orders', icon: ClipboardList },
+    { title: 'Нове замовлення', url: '/orders/new', icon: PackagePlus },
+    { title: 'Календар', url: '/calendar', icon: CalendarDays },
+    { title: 'Клієнти', url: '/clients', icon: Contact },
+    { title: 'Персонал', url: '/staff', icon: Users },
+    { title: 'Фінанси', url: '/finance', icon: Wallet },
+    { title: 'Послуги та ціни', url: '/services', icon: Sparkles },
+    { title: 'Адмін', url: '/admin', icon: ShieldUser },
+    { title: 'Налаштування', url: '/settings', icon: Settings },
+  ]
 </script>
 
 <script lang="ts">
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
+  import { GalleryVerticalEnd } from '@lucide/svelte'
   import { useSession } from '$lib/auth-client'
   import type { ComponentProps } from 'svelte'
   import NavMain from './nav-main.svelte'
   import NavUser from './nav-user.svelte'
-  import { GalleryVerticalEnd } from '@lucide/svelte'
 
   let {
     ref = $bindable(null),
@@ -44,7 +54,11 @@
     <div class="flex items-center gap-2 px-2 py-2">
       <GalleryVerticalEnd />
       <div class="group-data-[collapsible=icon]:hidden">
-        <p class="font-semibold text-sm">CRM Ремонт</p>
+        <p
+          class="scroll-m-20 text-3xl font-semibold tracking-tight transition-colors first:mt-0"
+        >
+          ProClean
+        </p>
       </div>
     </div>
   </Sidebar.Header>

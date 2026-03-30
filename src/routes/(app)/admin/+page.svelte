@@ -89,10 +89,10 @@
                 <form method="POST" action="?/delete" use:enhance>
                   <input type="hidden" name="id" value={user.id} />
                   <Button
-                    variant="ghost"
+                    variant="destructive"
                     size="sm"
                     type="submit"
-                    class="flex items-center gap-1.5 bg-red-600"
+                    class="flex items-center gap-1.5  "
                   >
                     <Trash />
                     Видалити
