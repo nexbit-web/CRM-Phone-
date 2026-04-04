@@ -55,12 +55,12 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  Brand: 'Brand',
-  DeviceModel: 'DeviceModel',
-  Part: 'Part',
+  Customer: 'Customer',
+  Property: 'Property',
+  CleaningService: 'CleaningService',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  DaySession: 'DaySession'
+  ReminderLog: 'ReminderLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,6 +86,7 @@ export const UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   role: 'role',
+  phone: 'phone',
   banned: 'banned',
   banReason: 'banReason',
   banExpires: 'banExpires',
@@ -141,42 +142,64 @@ export const VerificationScalarFieldEnum = {
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
 
 
-export const BrandScalarFieldEnum = {
+export const CustomerScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  phone: 'phone',
+  email: 'email',
+  companyName: 'companyName',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
-export type BrandScalarFieldEnum = (typeof BrandScalarFieldEnum)[keyof typeof BrandScalarFieldEnum]
+export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
 
 
-export const DeviceModelScalarFieldEnum = {
+export const PropertyScalarFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  address: 'address',
+  city: 'city',
+  area: 'area',
+  rooms: 'rooms',
+  type: 'type',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PropertyScalarFieldEnum = (typeof PropertyScalarFieldEnum)[keyof typeof PropertyScalarFieldEnum]
+
+
+export const CleaningServiceScalarFieldEnum = {
   id: 'id',
   name: 'name',
   type: 'type',
-  brandId: 'brandId'
+  basePrice: 'basePrice',
+  duration: 'duration',
+  description: 'description',
+  isActive: 'isActive'
 } as const
 
-export type DeviceModelScalarFieldEnum = (typeof DeviceModelScalarFieldEnum)[keyof typeof DeviceModelScalarFieldEnum]
-
-
-export const PartScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  price: 'price'
-} as const
-
-export type PartScalarFieldEnum = (typeof PartScalarFieldEnum)[keyof typeof PartScalarFieldEnum]
+export type CleaningServiceScalarFieldEnum = (typeof CleaningServiceScalarFieldEnum)[keyof typeof CleaningServiceScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  scheduledDate: 'scheduledDate',
   status: 'status',
-  clientName: 'clientName',
-  clientPhone: 'clientPhone',
-  deviceId: 'deviceId',
-  userId: 'userId',
-  daySessionId: 'daySessionId'
+  paymentStatus: 'paymentStatus',
+  customerId: 'customerId',
+  propertyId: 'propertyId',
+  cleanerId: 'cleanerId',
+  totalAmount: 'totalAmount',
+  paidAmount: 'paidAmount',
+  notes: 'notes',
+  createdById: 'createdById',
+  reminder1DaySent: 'reminder1DaySent',
+  reminder3HoursSent: 'reminder3HoursSent'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -185,21 +208,25 @@ export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof Or
 export const OrderItemScalarFieldEnum = {
   id: 'id',
   orderId: 'orderId',
-  partId: 'partId',
-  qty: 'qty'
+  serviceId: 'serviceId',
+  qty: 'qty',
+  price: 'price'
 } as const
 
 export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
 
 
-export const DaySessionScalarFieldEnum = {
+export const ReminderLogScalarFieldEnum = {
   id: 'id',
-  date: 'date',
-  closedAt: 'closedAt',
-  sentToTg: 'sentToTg'
+  orderId: 'orderId',
+  type: 'type',
+  sentAt: 'sentAt',
+  status: 'status',
+  telegramChatId: 'telegramChatId',
+  error: 'error'
 } as const
 
-export type DaySessionScalarFieldEnum = (typeof DaySessionScalarFieldEnum)[keyof typeof DaySessionScalarFieldEnum]
+export type ReminderLogScalarFieldEnum = (typeof ReminderLogScalarFieldEnum)[keyof typeof ReminderLogScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -38,20 +38,20 @@ export type Account = Prisma.AccountModel
  */
 export type Verification = Prisma.VerificationModel
 /**
- * Model Brand
+ * Model Customer
  * 
  */
-export type Brand = Prisma.BrandModel
+export type Customer = Prisma.CustomerModel
 /**
- * Model DeviceModel
+ * Model Property
  * 
  */
-export type DeviceModel = Prisma.DeviceModelModel
+export type Property = Prisma.PropertyModel
 /**
- * Model Part
+ * Model CleaningService
  * 
  */
-export type Part = Prisma.PartModel
+export type CleaningService = Prisma.CleaningServiceModel
 /**
  * Model Order
  * 
@@ -63,7 +63,7 @@ export type Order = Prisma.OrderModel
  */
 export type OrderItem = Prisma.OrderItemModel
 /**
- * Model DaySession
+ * Model ReminderLog
  * 
  */
-export type DaySession = Prisma.DaySessionModel
+export type ReminderLog = Prisma.ReminderLogModel

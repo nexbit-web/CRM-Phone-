@@ -16,13 +16,15 @@
   },
   "devDependencies": {
     "@internationalized/date": "^3.12.0",
-    "@lucide/svelte": "^0.561.0",
+    "@lucide/svelte": "^0.577.0",
     "@sveltejs/adapter-auto": "^7.0.0",
     "@sveltejs/adapter-vercel": "^6.3.3",
     "@sveltejs/kit": "^2.50.2",
     "@sveltejs/vite-plugin-svelte": "^6.2.4",
     "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/table-core": "^8.21.3",
     "@types/node-telegram-bot-api": "^0.64.14",
+    "@types/nprogress": "^0.2.3",
     "bits-ui": "^2.16.3",
     "clsx": "^2.1.1",
     "prettier": "^3.8.1",
@@ -41,10 +43,13 @@
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "better-auth": "^1.5.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.3.1",
     "lucide-svelte": "^0.577.0",
     "mode-watcher": "^1.1.0",
     "node-telegram-bot-api": "^0.67.0",
-    "prisma": "^7.5.0"
+    "nprogress": "^0.2.0",
+    "prisma": "^7.5.0",
+    "svelte-hot-french-toast": "^4.0.0"
   }
 }

@@ -31,6 +31,7 @@ export type UserMinAggregateOutputType = {
   emailVerified: boolean | null
   image: string | null
   role: string | null
+  phone: string | null
   banned: boolean | null
   banReason: string | null
   banExpires: Date | null
@@ -45,6 +46,7 @@ export type UserMaxAggregateOutputType = {
   emailVerified: boolean | null
   image: string | null
   role: string | null
+  phone: string | null
   banned: boolean | null
   banReason: string | null
   banExpires: Date | null
@@ -59,6 +61,7 @@ export type UserCountAggregateOutputType = {
   emailVerified: number
   image: number
   role: number
+  phone: number
   banned: number
   banReason: number
   banExpires: number
@@ -75,6 +78,7 @@ export type UserMinAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  phone?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -89,6 +93,7 @@ export type UserMaxAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  phone?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -103,6 +108,7 @@ export type UserCountAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  phone?: true
   banned?: true
   banReason?: true
   banExpires?: true
@@ -190,6 +196,7 @@ export type UserGroupByOutputType = {
   emailVerified: boolean
   image: string | null
   role: string
+  phone: string | null
   banned: boolean
   banReason: string | null
   banExpires: Date | null
@@ -225,12 +232,14 @@ export type UserWhereInput = {
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.StringFilter<"User"> | string
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   banned?: Prisma.BoolFilter<"User"> | boolean
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  orders?: Prisma.OrderListRelationFilter
+  createdOrders?: Prisma.OrderListRelationFilter
+  assignedOrders?: Prisma.OrderListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }
@@ -242,12 +251,14 @@ export type UserOrderByWithRelationInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  orders?: Prisma.OrderOrderByRelationAggregateInput
+  createdOrders?: Prisma.OrderOrderByRelationAggregateInput
+  assignedOrders?: Prisma.OrderOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
 }
@@ -262,12 +273,14 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emailVerified?: Prisma.BoolFilter<"User"> | boolean
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.StringFilter<"User"> | string
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
   banned?: Prisma.BoolFilter<"User"> | boolean
   banReason?: Prisma.StringNullableFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  orders?: Prisma.OrderListRelationFilter
+  createdOrders?: Prisma.OrderListRelationFilter
+  assignedOrders?: Prisma.OrderListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }, "id" | "email">
@@ -279,6 +292,7 @@ export type UserOrderByWithAggregationInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrderInput | Prisma.SortOrder
   banExpires?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -299,6 +313,7 @@ export type UserScalarWhereWithAggregatesInput = {
   emailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.StringWithAggregatesFilter<"User"> | string
+  phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banned?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   banReason?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   banExpires?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -313,12 +328,14 @@ export type UserCreateInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
@@ -330,12 +347,14 @@ export type UserUncheckedCreateInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
@@ -347,12 +366,14 @@ export type UserUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
@@ -364,12 +385,14 @@ export type UserUncheckedUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -381,6 +404,7 @@ export type UserCreateManyInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
@@ -395,6 +419,7 @@ export type UserUpdateManyMutationInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -409,6 +434,7 @@ export type UserUncheckedUpdateManyInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -423,6 +449,7 @@ export type UserCountOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
@@ -437,6 +464,7 @@ export type UserMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
@@ -451,6 +479,7 @@ export type UserMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
   banned?: Prisma.SortOrder
   banReason?: Prisma.SortOrder
   banExpires?: Prisma.SortOrder
@@ -461,6 +490,11 @@ export type UserMinOrderByAggregateInput = {
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -511,18 +545,34 @@ export type UserUpdateOneRequiredWithoutAccountsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAccountsInput, Prisma.UserUpdateWithoutAccountsInput>, Prisma.UserUncheckedUpdateWithoutAccountsInput>
 }
 
-export type UserCreateNestedOneWithoutOrdersInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrdersInput
+export type UserCreateNestedOneWithoutAssignedOrdersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedOrdersInput, Prisma.UserUncheckedCreateWithoutAssignedOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedOrdersInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutOrdersNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOrdersInput
-  upsert?: Prisma.UserUpsertWithoutOrdersInput
+export type UserCreateNestedOneWithoutCreatedOrdersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedOrdersInput, Prisma.UserUncheckedCreateWithoutCreatedOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedOrdersInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOrdersInput, Prisma.UserUpdateWithoutOrdersInput>, Prisma.UserUncheckedUpdateWithoutOrdersInput>
+}
+
+export type UserUpdateOneWithoutAssignedOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedOrdersInput, Prisma.UserUncheckedCreateWithoutAssignedOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedOrdersInput
+  upsert?: Prisma.UserUpsertWithoutAssignedOrdersInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedOrdersInput, Prisma.UserUpdateWithoutAssignedOrdersInput>, Prisma.UserUncheckedUpdateWithoutAssignedOrdersInput>
+}
+
+export type UserUpdateOneRequiredWithoutCreatedOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedOrdersInput, Prisma.UserUncheckedCreateWithoutCreatedOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedOrdersInput
+  upsert?: Prisma.UserUpsertWithoutCreatedOrdersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedOrdersInput, Prisma.UserUpdateWithoutCreatedOrdersInput>, Prisma.UserUncheckedUpdateWithoutCreatedOrdersInput>
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -532,12 +582,14 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
 
@@ -548,12 +600,14 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -580,12 +634,14 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
 
@@ -596,12 +652,14 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -612,12 +670,14 @@ export type UserCreateWithoutAccountsInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
 
@@ -628,12 +688,14 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -660,12 +722,14 @@ export type UserUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
 
@@ -676,91 +740,189 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
-export type UserCreateWithoutOrdersInput = {
+export type UserCreateWithoutAssignedOrdersInput = {
   id?: string
   name: string
   email: string
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutOrdersInput = {
+export type UserUncheckedCreateWithoutAssignedOrdersInput = {
   id?: string
   name: string
   email: string
   emailVerified?: boolean
   image?: string | null
   role?: string
+  phone?: string | null
   banned?: boolean
   banReason?: string | null
   banExpires?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutOrdersInput = {
+export type UserCreateOrConnectWithoutAssignedOrdersInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedOrdersInput, Prisma.UserUncheckedCreateWithoutAssignedOrdersInput>
 }
 
-export type UserUpsertWithoutOrdersInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutOrdersInput, Prisma.UserUncheckedUpdateWithoutOrdersInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutOrdersInput, Prisma.UserUncheckedCreateWithoutOrdersInput>
+export type UserCreateWithoutCreatedOrdersInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedOrdersInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedOrdersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedOrdersInput, Prisma.UserUncheckedCreateWithoutCreatedOrdersInput>
+}
+
+export type UserUpsertWithoutAssignedOrdersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedOrdersInput, Prisma.UserUncheckedUpdateWithoutAssignedOrdersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedOrdersInput, Prisma.UserUncheckedCreateWithoutAssignedOrdersInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutOrdersInput = {
+export type UserUpdateToOneWithWhereWithoutAssignedOrdersInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutOrdersInput, Prisma.UserUncheckedUpdateWithoutOrdersInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedOrdersInput, Prisma.UserUncheckedUpdateWithoutAssignedOrdersInput>
 }
 
-export type UserUpdateWithoutOrdersInput = {
+export type UserUpdateWithoutAssignedOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutOrdersInput = {
+export type UserUncheckedUpdateWithoutAssignedOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
   banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutCreatedOrdersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedOrdersInput, Prisma.UserUncheckedUpdateWithoutCreatedOrdersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedOrdersInput, Prisma.UserUncheckedCreateWithoutCreatedOrdersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedOrdersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedOrdersInput, Prisma.UserUncheckedUpdateWithoutCreatedOrdersInput>
+}
+
+export type UserUpdateWithoutCreatedOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -771,13 +933,15 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
  */
 
 export type UserCountOutputType = {
-  orders: number
+  createdOrders: number
+  assignedOrders: number
   sessions: number
   accounts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | UserCountOutputTypeCountOrdersArgs
+  createdOrders?: boolean | UserCountOutputTypeCountCreatedOrdersArgs
+  assignedOrders?: boolean | UserCountOutputTypeCountAssignedOrdersArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
 }
@@ -795,7 +959,14 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * UserCountOutputType without action
  */
-export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type UserCountOutputTypeCountCreatedOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignedOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderWhereInput
 }
 
@@ -821,12 +992,14 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  phone?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  createdOrders?: boolean | Prisma.User$createdOrdersArgs<ExtArgs>
+  assignedOrders?: boolean | Prisma.User$assignedOrdersArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -839,6 +1012,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  phone?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
@@ -853,6 +1027,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  phone?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
@@ -867,6 +1042,7 @@ export type UserSelectScalar = {
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  phone?: boolean
   banned?: boolean
   banReason?: boolean
   banExpires?: boolean
@@ -874,9 +1050,10 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "banned" | "banReason" | "banExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "phone" | "banned" | "banReason" | "banExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
+  createdOrders?: boolean | Prisma.User$createdOrdersArgs<ExtArgs>
+  assignedOrders?: boolean | Prisma.User$assignedOrdersArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -887,7 +1064,8 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    orders: Prisma.$OrderPayload<ExtArgs>[]
+    createdOrders: Prisma.$OrderPayload<ExtArgs>[]
+    assignedOrders: Prisma.$OrderPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     accounts: Prisma.$AccountPayload<ExtArgs>[]
   }
@@ -898,6 +1076,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emailVerified: boolean
     image: string | null
     role: string
+    phone: string | null
     banned: boolean
     banReason: string | null
     banExpires: Date | null
@@ -1297,7 +1476,8 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdOrders<T extends Prisma.User$createdOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedOrders<T extends Prisma.User$assignedOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1335,6 +1515,7 @@ export interface UserFieldRefs {
   readonly emailVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'String'>
+  readonly phone: Prisma.FieldRef<"User", 'String'>
   readonly banned: Prisma.FieldRef<"User", 'Boolean'>
   readonly banReason: Prisma.FieldRef<"User", 'String'>
   readonly banExpires: Prisma.FieldRef<"User", 'DateTime'>
@@ -1733,9 +1914,33 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.orders
+ * User.createdOrders
  */
-export type User$ordersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$createdOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
+  orderBy?: Prisma.OrderOrderByWithRelationInput | Prisma.OrderOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * User.assignedOrders
+ */
+export type User$assignedOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Order
    */

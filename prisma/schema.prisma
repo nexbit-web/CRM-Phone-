@@ -7,22 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 // npx prisma generate
-
-// ⚠️ Enum'ы должны быть объявлены ДО моделей которые их используют
-
- 
-
-enum OrderStatus {
-  RECEIVED
-  IN_PROGRESS
-  READY
-  ISSUED
-}
-
-enum DeviceType {
-  PHONE
-  TABLET
-}
+// npx prisma migrate dev --name small_update
+// npx prisma generate
+// =============================================
+// BETTER AUTH МОДЕЛІ (залишаємо без змін)
+// =============================================
 
 model User {
   id            String    @id @default(cuid())
@@ -30,15 +19,19 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
-  role          String    @default("user")
+  role          String    @default("user")   // admin, manager, cleaner, accountant
+  phone         String?
   banned        Boolean   @default(false)
   banReason     String?
   banExpires    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  orders        Order[]
-  sessions      Session[]
-  accounts      Account[]
+
+  createdOrders   Order[]   @relation("CreatedOrders")
+  assignedOrders  Order[]   @relation("AssignedCleaner")
+
+  sessions        Session[]
+  accounts        Account[]
 }
 
 model Session {
@@ -54,20 +47,20 @@ model Session {
 }
 
 model Account {
-  id                String    @id @default(cuid())
-  userId            String
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId         String
-  providerId        String
-  accessToken       String?
-  refreshToken      String?
-  accessTokenExpiresAt DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope             String?
-  idToken           String?
-  password          String?   
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id                        String    @id @default(cuid())
+  userId                    String
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId                 String
+  providerId                String
+  accessToken               String?
+  refreshToken              String?
+  accessTokenExpiresAt      DateTime?
+  refreshTokenExpiresAt     DateTime?
+  scope                     String?
+  idToken                   String?
+  password                  String?   
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 }
 
 model Verification {
@@ -79,58 +72,156 @@ model Verification {
   updatedAt  DateTime @updatedAt
 }
 
-model Brand {
-  id     String        @id @default(cuid())
-  name   String        @unique
-  models DeviceModel[]
+// =============================================
+// МОДЕЛІ ДЛЯ КЛІНІНГОВОЇ CRM
+// =============================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
 }
 
-model DeviceModel {
-  id      String     @id @default(cuid())
-  name    String
-  type    DeviceType
-  brandId String
-  brand   Brand      @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  parts   Part[]     @relation("ModelParts")
-  orders  Order[]
+enum CleaningType {
+  REGULAR          // Підтримуюча уборка
+  GENERAL          // Генеральна уборка
+  AFTER_REPAIR     // Після ремонту
+  OFFICE           // Офісна уборка
+  DEEP_CLEAN       // Глибоке прибирання
+  CARPET           // Хімчистка меблів та килимів
+  WINDOW           // Миття вікон
+  OTHER
 }
 
-model Part {
-  id         String        @id @default(cuid())
-  name       String
-  price      Decimal       @db.Decimal(10, 2)
-  models     DeviceModel[] @relation("ModelParts")
-  orderItems OrderItem[]
+enum PaymentStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
 }
 
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+// ———————————————————————————————————————————————
+// Клієнт — фізична або юридична особа, яка замовляє уборку
+// ———————————————————————————————————————————————
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String   @unique
+  email       String?
+  companyName String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  properties  Property[]
+  orders      Order[]
+}
+
+// ———————————————————————————————————————————————
+// Об'єкт нерухомості (квартира, офіс, будинок тощо)
+// ———————————————————————————————————————————————
+model Property {
+  id          String   @id @default(cuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  address     String
+  city        String   @default("Київ")
+  area        Int?     // площа в м²
+  rooms       Int?
+  type        String?
+  notes       String?
+
+  orders      Order[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ———————————————————————————————————————————————
+// Послуга клінінгу (що саме можна замовити)
+// ———————————————————————————————————————————————
+model CleaningService {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  type        CleaningType
+  basePrice   Decimal      @db.Decimal(10, 2)
+  duration    Int?         // орієнтовна тривалість у хвилинах
+  description String?
+  isActive    Boolean      @default(true)
+
+  orderItems  OrderItem[]
+}
+
+// ———————————————————————————————————————————————
+// Замовлення на уборку (головна сутність CRM)
+// ———————————————————————————————————————————————
 model Order {
-  id           String      @id @default(cuid())
-  createdAt    DateTime    @default(now())
-  status       OrderStatus @default(RECEIVED)
-  clientName   String
-  clientPhone  String
-  deviceId     String
-  device       DeviceModel @relation(fields: [deviceId], references: [id])
-  items        OrderItem[]
-  userId       String
-  user         User        @relation(fields: [userId], references: [id])
-  daySessionId String?
-  daySession   DaySession? @relation(fields: [daySessionId], references: [id])
+  id                  String        @id @default(cuid())
+  createdAt           DateTime      @default(now())
+  scheduledDate       DateTime      // дата та час запланованої уборки
+
+  status              OrderStatus   @default(PENDING)
+  paymentStatus       PaymentStatus @default(UNPAID)
+
+  customerId        String
+  customer          Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)    
+
+  propertyId          String
+  property            Property      @relation(fields: [propertyId], references: [id])
+
+  cleanerId           String?
+  cleaner             User?         @relation("AssignedCleaner", fields: [cleanerId], references: [id])
+
+  totalAmount         Decimal       @db.Decimal(10, 2)
+  paidAmount          Decimal       @default(0) @db.Decimal(10, 2)
+
+  notes               String?
+  createdById         String
+  createdBy           User          @relation("CreatedOrders", fields: [createdById], references: [id])
+
+  // Поля для системи нагадувань
+  reminder1DaySent    Boolean       @default(false)   // нагадування за 1 день відправлено?
+  reminder3HoursSent  Boolean       @default(false)   // нагадування за 3 години відправлено?
+
+  items               OrderItem[]
+  reminders           ReminderLog[]
 }
 
+// ———————————————————————————————————————————————
+// Позиції в замовленні (які послуги входять у замовлення)
+// ———————————————————————————————————————————————
 model OrderItem {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  partId  String
-  part    Part   @relation(fields: [partId], references: [id])
-  qty     Int    @default(1)
+  id         String          @id @default(cuid())
+  orderId    String
+  order      Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  serviceId  String
+  service    CleaningService @relation(fields: [serviceId], references: [id])
+
+  qty        Int             @default(1)
+  price      Decimal         @db.Decimal(10, 2)
 }
 
-model DaySession {
-  id       String    @id @default(cuid())
-  date     DateTime  @default(now())
-  closedAt DateTime?
-  sentToTg Boolean   @default(false)
-  orders   Order[]
+// ———————————————————————————————————————————————
+// Історія відправлених нагадувань (для надійності та логів)
+// ———————————————————————————————————————————————
+model ReminderLog {
+  id              String         @id @default(cuid())
+  orderId         String
+  order           Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  type            String         // "1day" або "3hours"
+  sentAt          DateTime       @default(now())
+  status          ReminderStatus @default(SENT)
+  telegramChatId  String?
+  error           String?
+
+  @@index([orderId, type])
 }

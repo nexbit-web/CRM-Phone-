@@ -10,18 +10,43 @@
 */
 
 export const OrderStatus = {
-  RECEIVED: 'RECEIVED',
+  PENDING: 'PENDING',
+  CONFIRMED: 'CONFIRMED',
   IN_PROGRESS: 'IN_PROGRESS',
-  READY: 'READY',
-  ISSUED: 'ISSUED'
+  COMPLETED: 'COMPLETED',
+  CANCELED: 'CANCELED'
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
 
 
-export const DeviceType = {
-  PHONE: 'PHONE',
-  TABLET: 'TABLET'
+export const CleaningType = {
+  REGULAR: 'REGULAR',
+  GENERAL: 'GENERAL',
+  AFTER_REPAIR: 'AFTER_REPAIR',
+  OFFICE: 'OFFICE',
+  DEEP_CLEAN: 'DEEP_CLEAN',
+  CARPET: 'CARPET',
+  WINDOW: 'WINDOW',
+  OTHER: 'OTHER'
 } as const
 
-export type DeviceType = (typeof DeviceType)[keyof typeof DeviceType]
+export type CleaningType = (typeof CleaningType)[keyof typeof CleaningType]
+
+
+export const PaymentStatus = {
+  UNPAID: 'UNPAID',
+  PARTIALLY_PAID: 'PARTIALLY_PAID',
+  PAID: 'PAID'
+} as const
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const ReminderStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type ReminderStatus = (typeof ReminderStatus)[keyof typeof ReminderStatus]
