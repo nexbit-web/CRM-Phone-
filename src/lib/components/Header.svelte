@@ -4,6 +4,7 @@
   import * as Sidebar from '$lib/components/ui/sidebar'
   import ModeToggle from './ModeToggle.svelte'
   import { page } from '$app/stores'
+  import { ClipboardList } from 'lucide-svelte'
 
   const titles: Record<string, string> = {
     '/dashboard': 'Дашборд',
@@ -24,7 +25,12 @@
     <Breadcrumb.Root>
       <Breadcrumb.List>
         <Breadcrumb.Item>
-          <Breadcrumb.Page>
+          <Breadcrumb.Page class="flex  gap-1">
+            <div class="flex items-center gap-1 text-muted-foreground mb-1">
+              <ClipboardList class="h-3.5 w-3.5" />
+              <span>CRM</span>
+              <span class="mx-0.5">/</span>
+            </div>
             {titles[$page.url.pathname] ?? 'CRM'}
           </Breadcrumb.Page>
         </Breadcrumb.Item>
