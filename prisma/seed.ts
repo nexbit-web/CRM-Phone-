@@ -42,6 +42,15 @@ async function main() {
       role: 'admin',
     },
   })
+  // await auth.api.createUser({
+  //   body: {
+  //     name: 'Микита',
+  //     email: 'nik@crm.com',
+  //     password: 'qwertyuiop2000',
+  //     role: 'admin',
+  //   },
+  // })
+  // v9K#xP2!mQ7@Lr4
 
   console.log('✅ Владелец создан!')
   console.log('   Email:  owner@crm.com')

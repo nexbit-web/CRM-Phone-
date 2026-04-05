@@ -182,7 +182,7 @@
 {/if}
 
 <!-- ─── ОСНОВНИЙ КОНТЕНТ ───────────────────────────────── -->
-<div class="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+<div class="mx-auto max-w-screen-2xl px-1 py-8 sm:px-6 lg:px-8 space-y-6">
   <div class="flex flex-col gap-4">
     <!-- Рядок 1: заголовок + кнопки -->
     <div class="flex items-center justify-between gap-4">
@@ -205,11 +205,11 @@
           disabled={loading}
         >
           <RefreshCw class="h-4 w-4 {loading ? 'animate-spin' : ''}" />
-          <span class="hidden sm:inline ml-1.5">Оновити</span>
+         
         </Button>
         <Button href="/orders/new" size="sm" class="h-9">
           <Plus class="h-4 w-4" />
-          <span class="ml-1.5">Нове замовлення</span>
+          <span  >Нове</span>
         </Button>
       </div>
     </div>
