@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { goto } from '$app/navigation'
   import { Button } from '$lib/components/ui/button'
   import * as Table from '$lib/components/ui/table'
   import * as Select from '$lib/components/ui/select'
@@ -9,8 +10,6 @@
     Plus,
     Search,
     X,
-    Eye,
-    Edit2,
     Calendar,
     User,
     MapPin,
@@ -37,7 +36,7 @@
     id: string
     scheduledDate: string
     status: OrderStatus
-    totalAmount: string | number
+    totalAmount: unknown // ✅ було: string | number — Prisma повертає Decimal
     customer: { name: string; phone: string }
     property: { address: string; city: string }
     cleaner?: { name: string }
@@ -54,12 +53,7 @@
   // ─── Статуси ────────────────────────────────────────────
   const statusConfig: Record<
     OrderStatus,
-    {
-      label: string
-      icon: any
-      class: string
-      dot: string
-    }
+    { label: string; icon: any; class: string; dot: string }
   > = {
     PENDING: {
       label: 'Нове',
@@ -150,8 +144,10 @@
   )
 
   // ─── Хелпери ────────────────────────────────────────────
-  function formatAmount(amount: string | number): string {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount
+
+  // ✅ було: amount: string | number — тепер unknown бо Prisma Decimal
+  function formatAmount(amount: unknown): string {
+    const num = parseFloat(String(amount))
     if (isNaN(num)) return '0'
     return num.toLocaleString('uk-UA', { minimumFractionDigits: 0 })
   }
@@ -187,11 +183,9 @@
 
 <!-- ─── ОСНОВНИЙ КОНТЕНТ ───────────────────────────────── -->
 <div class="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
-  <!-- ── Хедер + тулбар в один рядок ── -->
   <div class="flex flex-col gap-4">
     <!-- Рядок 1: заголовок + кнопки -->
     <div class="flex items-center justify-between gap-4">
-      <!-- Ліво: хлібні крихти + заголовок -->
       <div>
         <h1 class="text-2xl font-bold tracking-tight leading-none">
           Замовлення
@@ -202,8 +196,6 @@
           {/if}
         </h1>
       </div>
-
-      <!-- Право: кнопки — та сама висота h-9 -->
       <div class="flex items-center gap-2 shrink-0">
         <Button
           variant="outline"
@@ -222,9 +214,8 @@
       </div>
     </div>
 
-    <!-- Рядок 2: інпут і фільтр — трохи нижче заголовка -->
+    <!-- Рядок 2: пошук + фільтр -->
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-      <!-- Пошук — h-9, розтягується -->
       <div class="relative flex-1">
         <Search
           class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none"
@@ -243,17 +234,13 @@
           </button>
         {/if}
       </div>
-
-      <!-- Фільтр статусу — h-9, фіксована ширина -->
       <Select.Root type="single" bind:value={statusFilter}>
         <Select.Trigger class="h-9 w-full sm:w-44">
           {currentStatusLabel}
         </Select.Trigger>
         <Select.Content>
           {#each statusOptions as option (option.value)}
-            <Select.Item value={option.value}>
-              {option.label}
-            </Select.Item>
+            <Select.Item value={option.value}>{option.label}</Select.Item>
           {/each}
         </Select.Content>
       </Select.Root>
@@ -326,14 +313,17 @@
             <Table.Head class="font-semibold text-foreground text-right pr-5"
               >Сума</Table.Head
             >
-            <Table.Head class="w-20"></Table.Head>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
           {#each filteredOrders as order (order.id)}
             {@const cfg = statusConfig[order.status] ?? statusConfig.PENDING}
-            <Table.Row class="group hover:bg-muted/30 transition-colors">
+            <!-- ✅ Весь рядок клікабельний -->
+            <Table.Row
+              class="group hover:bg-muted/30 transition-colors cursor-pointer"
+              onclick={() => goto(`/orders/${order.id}`)}
+            >
               <Table.Cell class="pl-5">
                 <div class="flex items-start gap-2">
                   <Calendar
@@ -419,19 +409,6 @@
                   {formatAmount(order.totalAmount)} ₴
                 </span>
               </Table.Cell>
-
-              <Table.Cell>
-                <div
-                  class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Button variant="ghost" size="icon" class="h-8 w-8">
-                    <Eye class="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" class="h-8 w-8">
-                    <Edit2 class="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </Table.Cell>
             </Table.Row>
           {/each}
         </Table.Body>
@@ -442,7 +419,11 @@
     <div class="grid gap-3 lg:hidden">
       {#each filteredOrders as order (order.id)}
         {@const cfg = statusConfig[order.status] ?? statusConfig.PENDING}
-        <div class="rounded-xl border bg-card shadow-sm p-4 space-y-3">
+        <!-- ✅ Картка клікабельна -->
+        <div
+          class="rounded-xl border bg-card shadow-sm p-4 space-y-3 cursor-pointer hover:border-primary/40 transition-colors"
+          onclick={() => goto(`/orders/${order.id}`)}
+        >
           <div class="flex items-start justify-between gap-2">
             <div class="flex items-center gap-2.5">
               <div
@@ -503,19 +484,9 @@
             <span class="text-base font-bold"
               >{formatAmount(order.totalAmount)} ₴</span
             >
-            <div class="flex gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                class="h-8 px-3 text-xs gap-1.5"
-              >
-                <Eye class="h-3.5 w-3.5" />
-                Переглянути
-              </Button>
-              <Button variant="ghost" size="icon" class="h-8 w-8">
-                <Edit2 class="h-3.5 w-3.5" />
-              </Button>
-            </div>
+            <span class="text-xs text-muted-foreground"
+              >Натисніть щоб відкрити →</span
+            >
           </div>
         </div>
       {/each}
