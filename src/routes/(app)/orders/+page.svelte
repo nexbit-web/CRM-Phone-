@@ -205,11 +205,10 @@
           disabled={loading}
         >
           <RefreshCw class="h-4 w-4 {loading ? 'animate-spin' : ''}" />
-         
         </Button>
         <Button href="/orders/new" size="sm" class="h-9">
           <Plus class="h-4 w-4" />
-          <span  >Нове</span>
+          <span>Нове</span>
         </Button>
       </div>
     </div>
@@ -360,7 +359,7 @@
                 </div>
               </Table.Cell>
 
-              <Table.Cell class="max-w-[200px]">
+              <Table.Cell class=" ">
                 <div class="flex items-start gap-1.5">
                   <MapPin
                     class="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0"
@@ -369,7 +368,7 @@
                 </div>
               </Table.Cell>
 
-              <Table.Cell class="max-w-[200px]">
+              <Table.Cell class=" ">
                 <span class="text-sm text-muted-foreground truncate block">
                   {order.items.length > 0
                     ? order.items.map((i) => i.service.name).join(', ')

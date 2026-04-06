@@ -3,6 +3,43 @@ import prisma from '$lib/server/prisma'
 import { auth } from '$lib/auth'
 import type { RequestHandler } from './$types'
 
+// ── GET: пошук клієнтів ──────────────────────────────────
+export const GET: RequestHandler = async ({ request, url }) => {
+  const session = await auth.api.getSession({ headers: request.headers })
+  if (!session?.user) {
+    return json({ success: false, error: 'Не авторизований' }, { status: 401 })
+  }
+
+  const q = url.searchParams.get('q')?.trim() ?? ''
+
+  if (!q || q.length < 1) {
+    return json({ success: true, customers: [] })
+  }
+
+  const customers = await prisma.customer.findMany({
+    where: {
+      OR: [
+        { name: { contains: q, mode: 'insensitive' } },
+        { phone: { contains: q } },
+        { email: { contains: q, mode: 'insensitive' } },
+        { companyName: { contains: q, mode: 'insensitive' } },
+      ],
+    },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      email: true,
+      companyName: true,
+    },
+    orderBy: { name: 'asc' },
+    take: 10,
+  })
+
+  return json({ success: true, customers })
+}
+
+// ── POST: створення клієнта ──────────────────────────────
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const session = await auth.api.getSession({ headers: request.headers })
@@ -14,17 +51,15 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json()
-
     const { name, phone, email, companyName, notes } = body
 
     if (!name?.trim() || !phone?.trim()) {
       return json(
-        { success: false, error: 'Ім’я та телефон обов’язкові' },
+        { success: false, error: "Ім'я та телефон обов'язкові" },
         { status: 400 },
       )
     }
 
-    // Перевіряємо, чи вже існує клієнт з таким телефоном
     const existingCustomer = await prisma.customer.findUnique({
       where: { phone: phone.trim() },
     })

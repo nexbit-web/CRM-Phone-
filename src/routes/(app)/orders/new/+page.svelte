@@ -3,58 +3,98 @@
   import { Input } from '$lib/components/ui/input'
   import { Textarea } from '$lib/components/ui/textarea'
   import { Label } from '$lib/components/ui/label'
-  import * as Select from '$lib/components/ui/select'
-  import { Calendar } from '$lib/components/ui/calendar'
-  import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover'
-  import { format } from 'date-fns'
-  import { uk } from 'date-fns/locale'
+  import Calendar from '$lib/components/ui/calendar/calendar.svelte'
+  import * as Popover from '$lib/components/ui/popover/index.js'
   import {
-    ArrowLeft, Save, Calendar as CalendarIcon,
-    User, MapPin, Banknote, StickyNote,
-    Search, UserPlus, X, Check, Sparkles,
-    UserCheck, ChevronRight, AlertCircle,
+    ArrowLeft,
+    Save,
+    Calendar as CalendarIcon,
+    User,
+    MapPin,
+    Banknote,
+    StickyNote,
+    Search,
+    UserPlus,
+    X,
+    Check,
+    Sparkles,
+    UserCheck,
+    ChevronRight,
+    ChevronDown,
+    AlertCircle,
+    Hash,
   } from 'lucide-svelte'
   import { goto } from '$app/navigation'
+  import { page } from '$app/stores'
   import toast from 'svelte-hot-french-toast'
   import { onMount, tick } from 'svelte'
+  import { getLocalTimeZone, today, CalendarDate } from '@internationalized/date'
+  import type { DateValue } from '@internationalized/date'
 
-  type Customer = { id: string; name: string; phone: string; email?: string | null; companyName?: string | null }
-  type Cleaner  = { id: string; name: string }
+  // ─── Типи ───────────────────────────────────────────────
+  type Customer = {
+    id: string
+    name: string
+    phone: string
+    email?: string | null
+    companyName?: string | null
+  }
+  type Cleaner = { id: string; name: string }
 
+  // ─── Стан форми ─────────────────────────────────────────
   let selectedCustomer = $state<Customer | null>(null)
-  let customerSearch   = $state('')
-  let customers        = $state<Customer[]>([])
-  let searchLoading    = $state(false)
-  let searchOpen       = $state(false)
+  let customerSearch = $state('')
+  let customers = $state<Customer[]>([])
+  let searchLoading = $state(false)
+  let searchOpen = $state(false)
   let searchTimeout: ReturnType<typeof setTimeout>
 
-  let cleaners      = $state<Cleaner[]>([])
-  let cleanerId     = $state<string>('')
-  let address       = $state('')
-  let scheduledDate = $state<Date>(new Date())
-  let scheduledTime = $state('09:00')
-  let cleaningType  = $state('REGULAR')
-  let notes         = $state('')
-  let totalAmount   = $state<number | ''>('')
-  let loading       = $state(false)
-  let errors        = $state<Record<string, string>>({})
+  let cleaners = $state<Cleaner[]>([])
+  let cleanerId = $state('')
+  let address = $state('')
 
+  // Дата як CalendarDate з @internationalized/date
+  let scheduledDate = $state<DateValue | undefined>(today(getLocalTimeZone()))
+  let calendarOpen = $state(false)
+  let scheduledTime = $state('09:00')
+
+  let cleaningType = $state('REGULAR')
+  let notes = $state('')
+  let totalAmount = $state<number | ''>('')
+  let loading = $state(false)
+  let errors = $state<Record<string, string>>({})
+
+  // ─── Форматування дати для кнопки ───────────────────────
+  function formatDate(val: DateValue | undefined): string {
+    if (!val) return 'Оберіть дату'
+    const months = ['січ', 'лют', 'бер', 'кві', 'тра', 'чер', 'лип', 'сер', 'вер', 'жов', 'лис', 'гру']
+    return `${val.day} ${months[val.month - 1]} ${val.year}`
+  }
+
+  // ─── Валідація ──────────────────────────────────────────
   function validate() {
     const e: Record<string, string> = {}
-    if (!selectedCustomer) e.customer = "Оберіть або створіть клієнта"
-    if (!address.trim() || address.trim().length < 5) e.address = "Вкажіть адресу (не менше 5 символів)"
-    if (totalAmount !== '' && (isNaN(Number(totalAmount)) || Number(totalAmount) < 0))
+    if (!selectedCustomer) e.customer = 'Оберіть клієнта'
+    if (!address.trim() || address.trim().length < 5)
+      e.address = 'Вкажіть адресу (мін. 5 символів)'
+    if (!scheduledDate) e.date = 'Оберіть дату'
+    if (totalAmount !== '' && Number(totalAmount) < 0)
       e.totalAmount = "Сума не може бути від'ємною"
     errors = e
     return Object.keys(e).length === 0
   }
 
+  // ─── Пошук клієнтів ─────────────────────────────────────
   async function onSearchInput(e: Event) {
     const val = (e.target as HTMLInputElement).value
     customerSearch = val
     selectedCustomer = null
     clearTimeout(searchTimeout)
-    if (!val.trim()) { customers = []; searchOpen = false; return }
+    if (!val.trim()) {
+      customers = []
+      searchOpen = false
+      return
+    }
     searchTimeout = setTimeout(async () => {
       searchLoading = true
       searchOpen = true
@@ -62,7 +102,9 @@
         const res = await fetch(`/api/customers?q=${encodeURIComponent(val.trim())}`)
         const data = await res.json()
         if (data.success) customers = data.customers
-      } finally { searchLoading = false }
+      } finally {
+        searchLoading = false
+      }
     }, 250)
   }
 
@@ -71,7 +113,7 @@
     customerSearch = ''
     searchOpen = false
     customers = []
-    errors.customer = ''
+    errors = { ...errors, customer: '' }
   }
 
   function clearCustomer() {
@@ -81,15 +123,12 @@
     searchOpen = false
   }
 
-  import { page } from '$app/stores'
-
+  // ─── Завантаження ───────────────────────────────────────
   onMount(async () => {
-    // Завантажуємо клінерів
     const res = await fetch('/api/cleaners')
     const data = await res.json()
     if (data.success) cleaners = data.cleaners
 
-    // Якщо повернулися зі сторінки клієнта — автоматично знаходимо його
     const autoQ = $page.url.searchParams.get('q')
     if (autoQ) {
       customerSearch = autoQ
@@ -103,136 +142,203 @@
           customers = d.customers
           searchOpen = true
         }
-      } finally { searchLoading = false }
+      } finally {
+        searchLoading = false
+      }
     }
   })
 
+  // ─── Збереження ─────────────────────────────────────────
   async function createOrder() {
     if (!validate()) {
       await tick()
-      document.querySelector('[data-error]')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      document
+        .querySelector('[data-error]')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
+
     loading = true
-    const dateTime = new Date(scheduledDate)
+
+    // Конвертуємо CalendarDate → JS Date з урахуванням часового поясу
+    const tz = getLocalTimeZone()
+    const baseDate = scheduledDate!.toDate(tz)
     const [h, m] = scheduledTime.split(':').map(Number)
-    dateTime.setHours(h, m, 0, 0)
+    baseDate.setHours(h, m, 0, 0)
+
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customerName:  selectedCustomer!.name,
+          customerName: selectedCustomer!.name,
           customerPhone: selectedCustomer!.phone,
-          address:       address.trim(),
-          scheduledDate: dateTime.toISOString(),
+          address: address.trim(),
+          scheduledDate: baseDate.toISOString(),
           cleaningType,
-          notes:         notes.trim(),
-          totalAmount:   totalAmount === '' ? 0 : Number(totalAmount),
-          cleanerId:     cleanerId || undefined,
+          notes: notes.trim(),
+          totalAmount: totalAmount === '' ? 0 : Number(totalAmount),
+          cleanerId: cleanerId || undefined,
         }),
       })
       const data = await res.json()
-      if (data.success) { toast.success('Замовлення успішно створено!'); goto('/orders') }
-      else toast.error(data.error || 'Не вдалося створити замовлення')
-    } catch { toast.error('Помилка підключення до сервера') }
-    finally { loading = false }
+      if (data.success) {
+        toast.success('Замовлення створено!')
+        goto('/orders')
+      } else {
+        toast.error(data.error || 'Не вдалося створити замовлення')
+      }
+    } catch {
+      toast.error('Помилка підключення до сервера')
+    } finally {
+      loading = false
+    }
   }
 
   const cleaningTypes = [
-    { value: 'REGULAR',      label: 'Підтримуюча уборка' },
-    { value: 'GENERAL',      label: 'Генеральна уборка' },
+    { value: 'REGULAR', label: 'Підтримуюча уборка' },
+    { value: 'GENERAL', label: 'Генеральна уборка' },
     { value: 'AFTER_REPAIR', label: 'Після ремонту' },
-    { value: 'OFFICE',       label: 'Офісна уборка' },
-    { value: 'DEEP_CLEAN',   label: 'Глибоке прибирання' },
-    { value: 'CARPET',       label: 'Хімчистка меблів та килимів' },
-    { value: 'WINDOW',       label: 'Миття вікон' },
-    { value: 'OTHER',        label: 'Інше' },
+    { value: 'OFFICE', label: 'Офісна уборка' },
+    { value: 'DEEP_CLEAN', label: 'Глибоке прибирання' },
+    { value: 'CARPET', label: 'Хімчистка меблів та килимів' },
+    { value: 'WINDOW', label: 'Миття вікон' },
+    { value: 'OTHER', label: 'Інше' },
   ]
 
   function getInitials(name: string) {
-    return name.split(' ').slice(0, 2).map((p: string) => p[0]).join('').toUpperCase()
+    return name
+      .split(' ')
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join('')
+      .toUpperCase()
   }
 </script>
 
-<div class="max-w-3xl mx-auto space-y-5">
-
-  <!-- Хедер -->
-  <div class="flex items-center gap-3">
-    <Button variant="ghost" size="icon" class="h-8 w-8 shrink-0" onclick={() => goto('/orders')}>
-      <ArrowLeft class="h-4 w-4" />
-    </Button>
-    <div>
-      <h1 class="text-xl font-semibold tracking-tight">Нове замовлення</h1>
-      <p class="text-xs text-muted-foreground mt-0.5">Заповніть інформацію для створення замовлення</p>
+<!-- ══ ТОП-БАР ═══════════════════════════════════════════ -->
+<div class="sticky top-0 z-20 border-b bg-background/95 backdrop-blur-sm">
+  <div class="mx-auto max-w-3xl px-4 sm:px-6">
+    <div class="flex h-14 items-center justify-between gap-4">
+      <div class="flex items-center gap-1.5 text-sm min-w-0">
+        <button
+          onclick={() => goto('/orders')}
+          class="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors shrink-0"
+        >
+          <ArrowLeft class="h-4 w-4" />
+          <span class="hidden sm:inline">Замовлення</span>
+        </button>
+        <ChevronRight class="h-4 w-4 text-muted-foreground/40 shrink-0" />
+        <span class="font-semibold text-foreground truncate">Нове замовлення</span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          class="h-8 text-muted-foreground"
+          onclick={() => goto('/orders')}
+        >
+          <X class="h-3.5 w-3.5 mr-1" />Скасувати
+        </Button>
+        <Button size="sm" class="h-8 min-w-36" onclick={createOrder} disabled={loading}>
+          {#if loading}
+            <span class="h-3.5 w-3.5 border-2 border-current border-t-transparent rounded-full animate-spin mr-1.5"></span>
+            Створення...
+          {:else}
+            <Save class="h-3.5 w-3.5 mr-1.5" />Створити замовлення
+          {/if}
+        </Button>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- КЛІЄНТ -->
-  <section class="rounded-xl border bg-card overflow-hidden">
-    <div class="px-4 py-3 border-b bg-muted/30 flex items-center gap-2">
-      <User class="h-3.5 w-3.5 text-muted-foreground/70" />
-      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Клієнт</span>
+<!-- ══ ФОРМА ══════════════════════════════════════════════ -->
+<div class="mx-auto max-w-3xl px-4 sm:px-6 py-8 space-y-1">
+  <!-- Заголовок -->
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+      <Hash class="h-3.5 w-3.5" />
+      <span>Нове замовлення</span>
+    </div>
+    <h1 class="text-xl font-semibold">Створення замовлення</h1>
+    <p class="text-sm text-muted-foreground mt-1">
+      Заповніть обов'язкові поля, позначені <span class="text-destructive">*</span>
+    </p>
+  </div>
+
+  <!-- ── КЛІЄНТ ── -->
+  <section>
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <User class="h-3.5 w-3.5 text-muted-foreground/60" />
+      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        Клієнт <span class="text-destructive">*</span>
+      </span>
       {#if errors.customer}
         <span class="ml-auto flex items-center gap-1 text-xs text-destructive" data-error>
           <AlertCircle class="h-3 w-3" />{errors.customer}
         </span>
       {/if}
     </div>
-    <div class="p-4 space-y-3">
-      {#if selectedCustomer}
-        <div class="flex items-center gap-3 rounded-lg border bg-muted/20 px-3 py-2.5">
-          <div class="h-9 w-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0">
-            {getInitials(selectedCustomer.name)}
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium">{selectedCustomer.name}</p>
-            <p class="text-xs text-muted-foreground mt-0.5">{selectedCustomer.phone}</p>
-            {#if selectedCustomer.companyName}
-              <p class="text-xs text-muted-foreground/60 mt-0.5">{selectedCustomer.companyName}</p>
-            {/if}
-          </div>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <span class="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-md px-2 py-0.5 font-medium">
-              <Check class="h-3 w-3" /> Обрано
-            </span>
-            <Button variant="ghost" size="icon" class="h-7 w-7 text-muted-foreground hover:text-destructive" onclick={clearCustomer}>
-              <X class="h-3.5 w-3.5" />
-            </Button>
-          </div>
+
+    {#if selectedCustomer}
+      <div class="rounded-lg border bg-card p-3 flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 text-primary flex items-center justify-center text-sm font-bold shrink-0 ring-1 ring-primary/20">
+          {getInitials(selectedCustomer.name)}
         </div>
-      {:else}
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold">{selectedCustomer.name}</p>
+          <p class="text-xs text-muted-foreground mt-0.5">{selectedCustomer.phone}</p>
+          {#if selectedCustomer.companyName}
+            <p class="text-xs text-muted-foreground/60">{selectedCustomer.companyName}</p>
+          {/if}
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="inline-flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-md px-2 py-0.5 font-medium">
+            <Check class="h-3 w-3" />Обрано
+          </span>
+          <Button variant="ghost" size="icon" class="h-7 w-7 text-muted-foreground hover:text-destructive" onclick={clearCustomer}>
+            <X class="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+    {:else}
+      <div class="rounded-lg border bg-card p-3 space-y-3">
         <div class="relative">
-          <div class="relative">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-            <input
-              class="flex h-9 w-full rounded-md border border-input bg-transparent px-9 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 {errors.customer ? 'border-destructive focus-visible:ring-destructive' : ''}"
-              placeholder="Пошук за іменем або телефоном..."
-              value={customerSearch}
-              oninput={onSearchInput}
-              onfocus={() => { if (customerSearch && customers.length) searchOpen = true }}
-              onblur={() => setTimeout(() => (searchOpen = false), 200)}
-              autocomplete="off"
-            />
-            {#if customerSearch}
-              <button class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onclick={clearCustomer}>
-                <X class="h-3.5 w-3.5" />
-              </button>
-            {/if}
-          </div>
+          <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <input
+            class="flex h-9 w-full rounded-md border border-input bg-transparent pl-9 pr-9 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring {errors.customer ? 'border-destructive focus-visible:ring-destructive' : ''}"
+            placeholder="Ім'я або номер телефону..."
+            value={customerSearch}
+            oninput={onSearchInput}
+            onfocus={() => { if (customerSearch && customers.length) searchOpen = true }}
+            onblur={() => setTimeout(() => (searchOpen = false), 200)}
+            autocomplete="off"
+          />
+          {#if customerSearch}
+            <button
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              onclick={clearCustomer}
+            >
+              <X class="h-3.5 w-3.5" />
+            </button>
+          {/if}
 
           {#if searchOpen}
-            <div class="absolute z-50 top-full left-0 right-0 mt-1 rounded-lg border bg-popover shadow-md overflow-hidden">
+            <div class="absolute z-50 top-full left-0 right-0 mt-1 rounded-lg border bg-popover shadow-lg overflow-hidden">
               {#if searchLoading}
-                <div class="px-3 py-3 text-xs text-muted-foreground text-center">Пошук...</div>
+                <div class="px-4 py-3 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span class="h-3 w-3 border-2 border-muted-foreground border-t-transparent rounded-full animate-spin"></span>
+                  Пошук...
+                </div>
               {:else if customers.length === 0}
-                <div class="px-3 py-3 space-y-2">
-                  <p class="text-xs text-muted-foreground text-center">Клієнта не знайдено</p>
+                <div class="px-4 py-3 space-y-2 text-center">
+                  <p class="text-xs text-muted-foreground">Клієнта не знайдено</p>
                   <button
-                    class="w-full flex items-center justify-center gap-1.5 text-xs font-medium text-primary hover:underline py-1"
+                    class="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                     onmousedown={() => goto(`/clients/new?return=/orders/new&name=${encodeURIComponent(customerSearch)}`)}
                   >
-                    <UserPlus class="h-3.5 w-3.5" /> Створити нового клієнта
+                    <UserPlus class="h-3.5 w-3.5" />Створити нового клієнта
                   </button>
                 </div>
               {:else}
@@ -261,105 +367,145 @@
                     class="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                     onmousedown={() => goto(`/clients/new?return=/orders/new&name=${encodeURIComponent(customerSearch)}`)}
                   >
-                    <UserPlus class="h-3.5 w-3.5" /> Створити нового клієнта
+                    <UserPlus class="h-3.5 w-3.5" />Створити нового клієнта
                   </button>
                 </div>
               {/if}
             </div>
           {/if}
         </div>
+
         <p class="text-xs text-muted-foreground">
-          Введіть ім'я або номер телефону. Якщо клієнта немає —
-          <button class="text-primary underline underline-offset-2" onclick={() => goto('/clients/new?return=/orders/new')}>
-            створіть нового
-          </button>.
+          Введіть ім'я або телефон. Клієнта немає?
+          <button
+            class="text-primary underline underline-offset-2 hover:no-underline"
+            onclick={() => goto('/clients/new?return=/orders/new')}
+          >
+            Створити нового
+          </button>
         </p>
+      </div>
+    {/if}
+  </section>
+
+  <!-- ── АДРЕСА ── -->
+  <section class="pt-4">
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <MapPin class="h-3.5 w-3.5 text-muted-foreground/60" />
+      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        Адреса <span class="text-destructive">*</span>
+      </span>
+      {#if errors.address}
+        <span class="ml-auto flex items-center gap-1 text-xs text-destructive" data-error>
+          <AlertCircle class="h-3 w-3" />{errors.address}
+        </span>
       {/if}
     </div>
+    <div class="rounded-lg border bg-card p-3">
+      <div class="relative">
+        <MapPin class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+        <Input
+          class="pl-9 h-9 text-sm {errors.address ? 'border-destructive focus-visible:ring-destructive' : ''}"
+          bind:value={address}
+          placeholder="вул. Хрещатик, 22, кв. 45"
+          oninput={() => (errors = { ...errors, address: '' })}
+        />
+      </div>
+    </div>
   </section>
 
-  <!-- АДРЕСА ТА ЧАС -->
-  <section class="rounded-xl border bg-card overflow-hidden">
-    <div class="px-4 py-3 border-b bg-muted/30 flex items-center gap-2">
-      <MapPin class="h-3.5 w-3.5 text-muted-foreground/70" />
-      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Адреса та час</span>
+  <!-- ── ДАТА І ЧАС ── -->
+  <section class="pt-4">
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <CalendarIcon class="h-3.5 w-3.5 text-muted-foreground/60" />
+      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+        Дата та час <span class="text-destructive">*</span>
+      </span>
+      {#if errors.date}
+        <span class="ml-auto flex items-center gap-1 text-xs text-destructive" data-error>
+          <AlertCircle class="h-3 w-3" />{errors.date}
+        </span>
+      {/if}
     </div>
-    <div class="p-4 space-y-4">
-      <div class="space-y-1.5">
-        <Label for="address" class="text-xs font-medium">Адреса об'єкта <span class="text-destructive">*</span></Label>
-        <div class="relative">
-          <MapPin class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+    <div class="rounded-lg border bg-card p-3">
+      <div class="grid grid-cols-2 gap-3">
+        <!-- DATE PICKER з shadcn-svelte Calendar + Popover -->
+        <div class="space-y-1.5">
+          <Label class="text-xs text-muted-foreground">Дата</Label>
+          <Popover.Root bind:open={calendarOpen}>
+            <Popover.Trigger>
+              {#snippet child({ props })}
+                <Button
+                  {...props}
+                  variant="outline"
+                  class="w-full justify-between font-normal h-9 text-sm {errors.date ? 'border-destructive' : ''} {!scheduledDate ? 'text-muted-foreground' : ''}"
+                >
+                  <span class="flex items-center gap-2">
+                    <CalendarIcon class="h-3.5 w-3.5 text-muted-foreground" />
+                    {formatDate(scheduledDate)}
+                  </span>
+                  <ChevronDown class="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              {/snippet}
+            </Popover.Trigger>
+            <Popover.Content class="w-auto overflow-hidden p-0" align="start">
+              <Calendar
+                type="single"
+                bind:value={scheduledDate}
+                onValueChange={() => {
+                  calendarOpen = false
+                  errors = { ...errors, date: '' }
+                }}
+                captionLayout="dropdown"
+              />
+            </Popover.Content>
+          </Popover.Root>
+        </div>
+
+        <!-- TIME INPUT -->
+        <div class="space-y-1.5">
+          <Label class="text-xs text-muted-foreground">Час початку</Label>
           <Input
-            id="address"
-            class="pl-9 h-9 text-sm {errors.address ? 'border-destructive focus-visible:ring-destructive' : ''}"
-            bind:value={address}
-            placeholder="вул. Хрещатик, 22, кв. 45"
-            oninput={() => (errors.address = '')}
+            type="time"
+            bind:value={scheduledTime}
+            class="h-9 text-sm appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
           />
         </div>
-        {#if errors.address}
-          <p class="text-xs text-destructive flex items-center gap-1" data-error>
-            <AlertCircle class="h-3 w-3" />{errors.address}
-          </p>
-        {/if}
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div class="space-y-1.5">
-          <Label class="text-xs font-medium">Дата уборки <span class="text-destructive">*</span></Label>
-          <Popover>
-            <PopoverTrigger>
-              <Button variant="outline" class="w-full justify-start text-left font-normal text-sm h-9">
-                <CalendarIcon class="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                {format(scheduledDate, 'd MMM yyyy', { locale: uk })}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-auto p-0">
-              <Calendar type="single" bind:value={scheduledDate} />
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div class="space-y-1.5">
-          <Label for="time" class="text-xs font-medium">Час <span class="text-destructive">*</span></Label>
-          <Input id="time" type="time" class="h-9 text-sm" bind:value={scheduledTime} />
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- ТИП ТА ВАРТІСТЬ -->
-  <section class="rounded-xl border bg-card overflow-hidden">
-    <div class="px-4 py-3 border-b bg-muted/30 flex items-center gap-2">
-      <Sparkles class="h-3.5 w-3.5 text-muted-foreground/70" />
+  <!-- ── ТИП ТА СУМА ── -->
+  <section class="pt-4">
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <Sparkles class="h-3.5 w-3.5 text-muted-foreground/60" />
       <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Тип та вартість</span>
     </div>
-    <div class="p-4 space-y-4">
+    <div class="rounded-lg border bg-card p-3 space-y-3">
       <div class="space-y-1.5">
-        <Label class="text-xs font-medium">Тип уборки</Label>
-        <Select.Root type="single" bind:value={cleaningType}>
-          <Select.Trigger class="h-9 text-sm w-full">
-            {cleaningTypes.find(t => t.value === cleaningType)?.label ?? 'Оберіть тип'}
-          </Select.Trigger>
-          <Select.Content>
-            {#each cleaningTypes as type}
-              <Select.Item value={type.value} class="text-sm">{type.label}</Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <Label class="text-xs text-muted-foreground">Тип прибирання</Label>
+        <select
+          bind:value={cleaningType}
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          {#each cleaningTypes as type}
+            <option value={type.value}>{type.label}</option>
+          {/each}
+        </select>
       </div>
+
       <div class="space-y-1.5">
-        <Label for="totalAmount" class="text-xs font-medium">Сума замовлення (₴)</Label>
+        <Label class="text-xs text-muted-foreground">Сума (₴)</Label>
         <div class="relative">
           <Banknote class="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
           <Input
-            id="totalAmount"
             type="number"
             min="0"
             step="50"
-            class="pl-9 h-9 text-sm {errors.totalAmount ? 'border-destructive focus-visible:ring-destructive' : ''}"
+            class="pl-9 h-9 text-sm {errors.totalAmount ? 'border-destructive' : ''}"
             bind:value={totalAmount}
             placeholder="0"
-            oninput={() => (errors.totalAmount = '')}
+            oninput={() => (errors = { ...errors, totalAmount: '' })}
           />
         </div>
         {#if errors.totalAmount}
@@ -371,82 +517,73 @@
     </div>
   </section>
 
-  <!-- КЛІНЕР -->
-  <section class="rounded-xl border bg-card overflow-hidden">
-    <div class="px-4 py-3 border-b bg-muted/30 flex items-center gap-2">
-      <UserCheck class="h-3.5 w-3.5 text-muted-foreground/70" />
+  <!-- ── КЛІНЕР ── -->
+  <section class="pt-4">
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <UserCheck class="h-3.5 w-3.5 text-muted-foreground/60" />
       <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Клінер</span>
-      <span class="ml-auto text-xs text-muted-foreground">необов'язково</span>
+      <span class="ml-auto text-xs text-muted-foreground/60">необов'язково</span>
     </div>
-    <div class="p-4">
+    <div class="rounded-lg border bg-card p-3">
       {#if cleaners.length === 0}
-        <p class="text-xs text-muted-foreground italic">Немає доступних клінерів</p>
+        <p class="text-xs text-muted-foreground italic">Немає доступних клінерів. Призначте пізніше.</p>
       {:else}
-        <Select.Root type="single" bind:value={cleanerId}>
-          <Select.Trigger class="h-9 text-sm w-full">
-            {#if cleanerId}
-              {@const cl = cleaners.find(c => c.id === cleanerId)}
-              <div class="flex items-center gap-2">
-                <div class="h-5 w-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
-                  {getInitials(cl?.name ?? '')}
-                </div>
-                <span>{cl?.name}</span>
-              </div>
-            {:else}
-              <span class="text-muted-foreground">Призначити клінера...</span>
-            {/if}
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Item value="" class="text-sm text-muted-foreground">
-              <X class="h-3.5 w-3.5 mr-2 inline" /> Без клінера
-            </Select.Item>
-            {#each cleaners as cl}
-              <Select.Item value={cl.id} class="text-sm">
-                <div class="flex items-center gap-2">
-                  <div class="h-5 w-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0">
-                    {getInitials(cl.name)}
-                  </div>
-                  {cl.name}
-                </div>
-              </Select.Item>
-            {/each}
-          </Select.Content>
-        </Select.Root>
+        <select
+          bind:value={cleanerId}
+          class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          <option value="">— Без клінера —</option>
+          {#each cleaners as cl}
+            <option value={cl.id}>{cl.name}</option>
+          {/each}
+        </select>
       {/if}
     </div>
   </section>
 
-  <!-- ПРИМІТКИ -->
-  <section class="rounded-xl border bg-card overflow-hidden">
-    <div class="px-4 py-3 border-b bg-muted/30 flex items-center gap-2">
-      <StickyNote class="h-3.5 w-3.5 text-muted-foreground/70" />
-      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Примітки</span>
-      <span class="ml-auto text-xs text-muted-foreground">необов'язково</span>
+  <!-- ── НОТАТКИ ── -->
+  <section class="pt-4">
+    <div class="flex items-center gap-2 py-2 mb-1">
+      <StickyNote class="h-3.5 w-3.5 text-muted-foreground/60" />
+      <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Нотатки</span>
+      <span class="ml-auto text-xs text-muted-foreground/60">необов'язково</span>
     </div>
-    <div class="p-4">
+    <div class="rounded-lg border bg-card p-3">
       <Textarea
-        id="notes"
         bind:value={notes}
-        placeholder="Клієнт просить особливу увагу на кухню, є кіт, домофон 47..."
+        placeholder="Особливі побажання, деталі доступу, тварини в квартирі..."
         rows={3}
-        class="text-sm resize-none"
+        class="text-sm resize-none border-0 p-0 focus-visible:ring-0 bg-transparent shadow-none"
       />
     </div>
   </section>
 
-  <!-- КНОПКИ -->
-  <div class="flex items-center justify-between gap-3 pb-6">
-    <Button variant="outline" onclick={() => goto('/orders')} class="gap-2">
-      <ArrowLeft class="h-4 w-4" /> Скасувати
-    </Button>
-    <Button onclick={createOrder} disabled={loading} class="gap-2 min-w-44">
+  <!-- ── ПІДСУМОК і КНОПКА ── -->
+  <div class="pt-6 pb-8">
+    <div class="rounded-lg border bg-muted/30 p-4 mb-4 space-y-2">
+      <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Підсумок</p>
+      <div class="grid grid-cols-2 gap-y-2 text-sm">
+        <span class="text-muted-foreground">Клієнт</span>
+        <span class="font-medium text-right">{selectedCustomer?.name ?? '—'}</span>
+        <span class="text-muted-foreground">Адреса</span>
+        <span class="font-medium text-right truncate">{address || '—'}</span>
+        <span class="text-muted-foreground">Дата</span>
+        <span class="font-medium text-right">{formatDate(scheduledDate)}, {scheduledTime}</span>
+        <span class="text-muted-foreground">Сума</span>
+        <span class="font-semibold text-right">
+          {totalAmount === '' ? '0' : Number(totalAmount).toLocaleString('uk-UA')} ₴
+        </span>
+      </div>
+    </div>
+
+    <Button class="w-full h-10 text-sm" onclick={createOrder} disabled={loading}>
       {#if loading}
-        <span class="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-        Створення...
+        <span class="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></span>
+        Створення замовлення...
       {:else}
-        <Save class="h-4 w-4" /> Створити замовлення
+        <Save class="h-4 w-4 mr-2" />
+        Створити замовлення
       {/if}
     </Button>
   </div>
-
 </div>

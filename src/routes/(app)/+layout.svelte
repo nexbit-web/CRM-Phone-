@@ -25,7 +25,7 @@
   <AppSidebar />
   <Sidebar.Inset>
     <Header />
-    <main class="p-6">
+    <main class="p-3">
       {@render children()}
     </main>
   </Sidebar.Inset>
