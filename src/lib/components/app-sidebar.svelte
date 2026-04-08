@@ -11,6 +11,7 @@
     Sparkles,
     Settings,
     ShieldUser,
+    UserPlus,
   } from '@lucide/svelte'
 
   type NavItem = {
@@ -24,6 +25,7 @@
     { title: 'Нове замовлення', url: '/orders/new', icon: PackagePlus },
     { title: 'Календар', url: '/calendar', icon: CalendarDays },
     { title: 'Клієнти', url: '/clients', icon: Contact },
+    { title: 'Додати клієнта', url: '/clients/new', icon: UserPlus },
     { title: 'Персонал', url: '/staff', icon: Users },
     { title: 'Фінанси', url: '/finance', icon: Wallet },
     { title: 'Послуги та ціни', url: '/services', icon: Sparkles },

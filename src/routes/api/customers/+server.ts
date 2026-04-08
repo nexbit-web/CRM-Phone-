@@ -3,7 +3,7 @@ import prisma from '$lib/server/prisma'
 import { auth } from '$lib/auth'
 import type { RequestHandler } from './$types'
 
-// ── GET: пошук клієнтів ──────────────────────────────────
+// ── GET: пошук клієнтів ─────────────────────────────────
 export const GET: RequestHandler = async ({ request, url }) => {
   const session = await auth.api.getSession({ headers: request.headers })
   if (!session?.user) {
@@ -16,13 +16,13 @@ export const GET: RequestHandler = async ({ request, url }) => {
     return json({ success: true, customers: [] })
   }
 
+  // ✅ companyName прибрано — його немає в новій схемі Customer
   const customers = await prisma.customer.findMany({
     where: {
       OR: [
         { name: { contains: q, mode: 'insensitive' } },
         { phone: { contains: q } },
         { email: { contains: q, mode: 'insensitive' } },
-        { companyName: { contains: q, mode: 'insensitive' } },
       ],
     },
     select: {
@@ -30,7 +30,6 @@ export const GET: RequestHandler = async ({ request, url }) => {
       name: true,
       phone: true,
       email: true,
-      companyName: true,
     },
     orderBy: { name: 'asc' },
     take: 10,
@@ -51,7 +50,7 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json()
-    const { name, phone, email, companyName, notes } = body
+    const { name, phone, email, notes } = body
 
     if (!name?.trim() || !phone?.trim()) {
       return json(
@@ -60,11 +59,11 @@ export const POST: RequestHandler = async ({ request }) => {
       )
     }
 
-    const existingCustomer = await prisma.customer.findUnique({
+    const existing = await prisma.customer.findUnique({
       where: { phone: phone.trim() },
     })
 
-    if (existingCustomer) {
+    if (existing) {
       return json(
         { success: false, error: 'Клієнт з таким телефоном вже існує' },
         { status: 409 },
@@ -76,16 +75,11 @@ export const POST: RequestHandler = async ({ request }) => {
         name: name.trim(),
         phone: phone.trim(),
         email: email?.trim() || null,
-        companyName: companyName?.trim() || null,
         notes: notes?.trim() || null,
       },
     })
 
-    return json({
-      success: true,
-      message: 'Клієнт успішно створений',
-      customer: newCustomer,
-    })
+    return json({ success: true, customer: newCustomer })
   } catch (error) {
     console.error('Помилка створення клієнта:', error)
     return json(

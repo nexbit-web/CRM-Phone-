@@ -23,6 +23,7 @@
     CheckCircle2,
   } from 'lucide-svelte'
   import { Input } from '$lib/components/ui/input'
+  import { Spinner } from '$lib/components/ui/spinner/index.js'
 
   // ─── Типи ───────────────────────────────────────────────
   type OrderStatus =
@@ -163,26 +164,20 @@
 </script>
 
 <!-- ─── FULLSCREEN SPINNER ─────────────────────────────── -->
-{#if loading}
-  <div
-    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
-  >
-    <div class="flex flex-col items-center gap-4">
-      <div class="relative">
-        <div class="h-16 w-16 rounded-full border-4 border-muted"></div>
-        <div
-          class="absolute inset-0 h-16 w-16 animate-spin rounded-full border-4 border-primary border-t-transparent"
-        ></div>
-      </div>
-      <p class="text-sm font-medium text-muted-foreground animate-pulse">
-        Завантаження замовлень...
-      </p>
-    </div>
-  </div>
-{/if}
 
 <!-- ─── ОСНОВНИЙ КОНТЕНТ ───────────────────────────────── -->
+
 <div class="mx-auto max-w-screen-2xl px-1 py-8 sm:px-6 lg:px-8 space-y-6">
+  {#if loading}
+    <div class="absolute  inset-0 z-50 flex items-center justify-center">
+      <div class="flex flex-col items-center gap-3">
+        <Spinner class="h-8 w-8" />
+        <p class="text-sm font-medium text-muted-foreground">
+          Завантаження замовлень...
+        </p>
+      </div>
+    </div>
+  {/if}
   <div class="flex flex-col gap-4">
     <!-- Рядок 1: заголовок + кнопки -->
     <div class="flex items-center justify-between gap-4">

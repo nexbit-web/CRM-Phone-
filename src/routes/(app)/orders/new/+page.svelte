@@ -24,6 +24,7 @@
     AlertCircle,
     Hash,
     Clock,
+    Building2,
   } from 'lucide-svelte'
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
@@ -32,14 +33,22 @@
   import { getLocalTimeZone, today } from '@internationalized/date'
   import type { DateValue } from '@internationalized/date'
 
+  // ─── Типи ───────────────────────────────────────────────
   type Customer = {
     id: string
     name: string
     phone: string
     email?: string | null
-    companyName?: string | null
   }
   type Cleaner = { id: string; name: string }
+  type Property = {
+    id: string
+    street: string
+    apt?: string | null
+    floor?: number | null
+    city: string
+    area?: number | null
+  }
 
   // ─── Стан ───────────────────────────────────────────────
   let selectedCustomer = $state<Customer | null>(null)
@@ -49,9 +58,14 @@
   let searchOpen = $state(false)
   let searchTimeout: ReturnType<typeof setTimeout>
 
+  // Об'єкти нерухомості клієнта
+  let customerProperties = $state<Property[]>([])
+  let selectedPropertyId = $state<string>('') // '' = нова адреса
+  let propertiesLoading = $state(false)
+
   let cleaners = $state<Cleaner[]>([])
   let cleanerId = $state('')
-  let address = $state('')
+  let address = $state('') // пряме введення якщо немає збережених
   let scheduledDate = $state<DateValue | undefined>(today(getLocalTimeZone()))
   let calendarOpen = $state(false)
   let scheduledTime = $state('09:00')
@@ -76,12 +90,10 @@
     'лис',
     'гру',
   ]
-
-  function formatDate(val: DateValue | undefined): string {
+  function formatDate(val: DateValue | undefined) {
     if (!val) return 'Оберіть дату'
     return `${val.day} ${MONTHS[val.month - 1]} ${val.year}`
   }
-
   function getInitials(name: string) {
     return name
       .split(' ')
@@ -90,15 +102,21 @@
       .join('')
       .toUpperCase()
   }
+  function formatPropertyLabel(p: Property) {
+    const parts = [p.street]
+    if (p.apt) parts.push(`кв. ${p.apt}`)
+    if (p.floor) parts.push(`${p.floor} пов.`)
+    return parts.join(', ')
+  }
 
   const cleaningTypes = [
-    { value: 'REGULAR', label: 'Підтримуюча уборка' },
-    { value: 'GENERAL', label: 'Генеральна уборка' },
+    { value: 'REGULAR', label: 'Підтримуюча' },
+    { value: 'GENERAL', label: 'Генеральна' },
     { value: 'AFTER_REPAIR', label: 'Після ремонту' },
-    { value: 'OFFICE', label: 'Офісна уборка' },
-    { value: 'DEEP_CLEAN', label: 'Глибоке прибирання' },
-    { value: 'CARPET', label: 'Хімчистка меблів та килимів' },
-    { value: 'WINDOW', label: 'Миття вікон' },
+    { value: 'OFFICE', label: 'Офісна' },
+    { value: 'DEEP_CLEAN', label: 'Глибоке' },
+    { value: 'CARPET', label: 'Хімчистка' },
+    { value: 'WINDOW', label: 'Вікна' },
     { value: 'OTHER', label: 'Інше' },
   ]
 
@@ -108,12 +126,20 @@
   const selectedTypeName = $derived(
     cleaningTypes.find((t) => t.value === cleaningType)?.label ?? '',
   )
+  const selectedProperty = $derived(
+    customerProperties.find((p) => p.id === selectedPropertyId),
+  )
+
+  // Адреса для підсумку і відправки
+  const effectiveAddress = $derived(
+    selectedProperty ? formatPropertyLabel(selectedProperty) : address,
+  )
 
   // ─── Валідація ──────────────────────────────────────────
   function validate() {
     const e: Record<string, string> = {}
     if (!selectedCustomer) e.customer = 'Оберіть клієнта'
-    if (!address.trim() || address.trim().length < 5)
+    if (!selectedPropertyId && (!address.trim() || address.trim().length < 5))
       e.address = 'Мін. 5 символів'
     if (!scheduledDate) e.date = 'Оберіть дату'
     if (totalAmount !== '' && Number(totalAmount) < 0)
@@ -127,6 +153,9 @@
     const val = (e.target as HTMLInputElement).value
     customerSearch = val
     selectedCustomer = null
+    customerProperties = []
+    selectedPropertyId = ''
+    address = ''
     clearTimeout(searchTimeout)
     if (!val.trim()) {
       customers = []
@@ -148,12 +177,31 @@
     }, 250)
   }
 
-  function selectCustomer(c: Customer) {
+  // ─── Вибір клієнта → завантаження об'єктів ──────────────
+  async function selectCustomer(c: Customer) {
     selectedCustomer = c
     customerSearch = ''
     searchOpen = false
     customers = []
     errors = { ...errors, customer: '' }
+
+    // Завантажуємо об'єкти клієнта
+    propertiesLoading = true
+    selectedPropertyId = ''
+    address = ''
+    try {
+      const res = await fetch(`/api/customers/${c.id}/properties`)
+      const data = await res.json()
+      if (data.success) {
+        customerProperties = data.properties
+        // Автоматично вибираємо першу адресу якщо вона одна
+        if (data.properties.length === 1) {
+          selectedPropertyId = data.properties[0].id
+        }
+      }
+    } finally {
+      propertiesLoading = false
+    }
   }
 
   function clearCustomer() {
@@ -161,9 +209,12 @@
     customerSearch = ''
     customers = []
     searchOpen = false
+    customerProperties = []
+    selectedPropertyId = ''
+    address = ''
   }
 
-  // ─── Завантаження ───────────────────────────────────────
+  // ─── Завантаження даних ─────────────────────────────────
   onMount(async () => {
     const res = await fetch('/api/cleaners')
     const data = await res.json()
@@ -177,7 +228,7 @@
         const r = await fetch(`/api/customers?q=${encodeURIComponent(autoQ)}`)
         const d = await r.json()
         if (d.success && d.customers.length === 1)
-          selectCustomer(d.customers[0])
+          await selectCustomer(d.customers[0])
         else if (d.success && d.customers.length > 1) {
           customers = d.customers
           searchOpen = true
@@ -188,7 +239,7 @@
     }
   })
 
-  // ─── Створення ──────────────────────────────────────────
+  // ─── Створення замовлення ───────────────────────────────
   async function createOrder() {
     if (!validate()) {
       await tick()
@@ -202,6 +253,7 @@
     const baseDate = scheduledDate!.toDate(tz)
     const [h, m] = scheduledTime.split(':').map(Number)
     baseDate.setHours(h, m, 0, 0)
+
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
@@ -209,7 +261,10 @@
         body: JSON.stringify({
           customerName: selectedCustomer!.name,
           customerPhone: selectedCustomer!.phone,
-          address: address.trim(),
+          // Передаємо або готовий propertyId або нову адресу
+          ...(selectedPropertyId
+            ? { propertyId: selectedPropertyId }
+            : { street: address.trim() }),
           scheduledDate: baseDate.toISOString(),
           cleaningType,
           notes: notes.trim(),
@@ -234,7 +289,6 @@
 <div class="sticky top-0 z-20 border-b bg-background/95 backdrop-blur-sm">
   <div class="mx-auto max-w-2xl px-4 sm:px-6">
     <div class="flex h-14 items-center justify-between gap-4">
-      <!-- Навігація -->
       <div class="flex items-center gap-1.5 text-sm min-w-0">
         <button
           onclick={() => goto('/orders')}
@@ -248,8 +302,6 @@
           >Нове замовлення</span
         >
       </div>
-
-      <!-- Єдина кнопка створення -->
       <Button
         size="sm"
         class="h-8 gap-1.5 cursor-pointer"
@@ -262,8 +314,7 @@
           ></span>
           Створення...
         {:else}
-          <Save class="h-3.5 w-3.5" />
-          Створити
+          <Save class="h-3.5 w-3.5" />Створити
         {/if}
       </Button>
     </div>
@@ -272,11 +323,9 @@
 
 <!-- ══ КОНТЕНТ ════════════════════════════════════════════ -->
 <div class="mx-auto max-w-2xl px-4 sm:px-6 py-8">
-  <!-- Заголовок сторінки -->
   <div class="mb-8">
     <div class="flex items-center gap-2 text-xs text-muted-foreground mb-1.5">
-      <Hash class="h-3 w-3" />
-      <span>CRM / Замовлення / Нове</span>
+      <Hash class="h-3 w-3" /><span>CRM / Замовлення / Нове</span>
     </div>
     <h1 class="text-2xl font-bold tracking-tight">Нове замовлення</h1>
     <p class="text-sm text-muted-foreground mt-1">
@@ -286,8 +335,7 @@
 
   <div class="space-y-5">
     <!-- ════ КЛІЄНТ ════════════════════════════════════════ -->
-    <div class="rounded-xl border bg-card overflow-hidden shadow-sm">
-      <!-- Заголовок секції -->
+    <div class="rounded-xl border bg-card overflow-visible shadow-sm">
       <div
         class="flex items-center justify-between px-4 py-3 border-b bg-muted/30"
       >
@@ -308,10 +356,8 @@
           </span>
         {/if}
       </div>
-
       <div class="p-4">
         {#if selectedCustomer}
-          <!-- Обраний клієнт -->
           <div
             class="flex items-center gap-3 rounded-lg border bg-muted/20 px-3 py-2.5"
           >
@@ -343,7 +389,6 @@
             </div>
           </div>
         {:else}
-          <!-- Пошук -->
           <div class="relative">
             <Search
               class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
@@ -369,8 +414,6 @@
                 <X class="h-3.5 w-3.5" />
               </button>
             {/if}
-
-            <!-- Дропдаун -->
             {#if searchOpen}
               <div
                 class="absolute z-50 mt-1 w-full overflow-hidden rounded-lg border bg-popover shadow-lg"
@@ -381,8 +424,7 @@
                   >
                     <span
                       class="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"
-                    ></span>
-                    Пошук...
+                    ></span>Пошук...
                   </div>
                 {:else if customers.length === 0}
                   <div class="px-4 py-4 text-center space-y-2">
@@ -436,15 +478,13 @@
               </div>
             {/if}
           </div>
-
           <p class="mt-2.5 text-xs text-muted-foreground">
             Клієнта немає?
             <button
               onclick={() => goto('/clients/new?return=/orders/new')}
               class="cursor-pointer text-primary underline underline-offset-2 hover:no-underline"
+              >Створити нового</button
             >
-              Створити нового
-            </button>
           </p>
         {/if}
       </div>
@@ -472,20 +512,122 @@
           </span>
         {/if}
       </div>
-      <div class="p-4">
-        <div class="relative">
-          <MapPin
-            class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
-          />
-          <Input
-            bind:value={address}
-            placeholder="вул. Хрещатик, 22, кв. 45"
-            class="h-9 pl-9 text-sm {errors.address
-              ? 'border-destructive focus-visible:ring-destructive'
-              : ''}"
-            oninput={() => (errors = { ...errors, address: '' })}
-          />
-        </div>
+      <div class="p-4 space-y-3">
+        {#if propertiesLoading}
+          <!-- Завантаження об'єктів -->
+          <div
+            class="flex items-center gap-2 py-2 text-xs text-muted-foreground"
+          >
+            <span
+              class="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent"
+            ></span>
+            Завантаження адрес клієнта...
+          </div>
+        {:else if customerProperties.length > 0}
+          <!-- Збережені адреси клієнта -->
+          <div class="space-y-1.5">
+            <p class="text-xs text-muted-foreground mb-2">
+              Оберіть збережену адресу або введіть нову:
+            </p>
+            {#each customerProperties as prop}
+              <button
+                onclick={() => {
+                  selectedPropertyId = prop.id
+                  errors = { ...errors, address: '' }
+                }}
+                class="cursor-pointer w-full flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-all
+                  {selectedPropertyId === prop.id
+                  ? 'border-primary/40 bg-primary/5'
+                  : 'border-input hover:bg-muted/30'}"
+              >
+                <div
+                  class="h-8 w-8 rounded-md bg-muted flex items-center justify-center shrink-0"
+                >
+                  <Building2 class="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium truncate">{prop.street}</p>
+                  <p class="text-xs text-muted-foreground">
+                    {[
+                      prop.apt ? `кв. ${prop.apt}` : '',
+                      prop.floor ? `${prop.floor} пов.` : '',
+                      prop.city,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ')}
+                    {#if prop.area}
+                      · {prop.area} м²{/if}
+                  </p>
+                </div>
+                {#if selectedPropertyId === prop.id}
+                  <Check class="h-4 w-4 text-primary shrink-0" />
+                {/if}
+              </button>
+            {/each}
+
+            <!-- Нова адреса -->
+            <button
+              onclick={() => {
+                selectedPropertyId = ''
+                address = ''
+              }}
+              class="cursor-pointer w-full flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all
+                {selectedPropertyId === ''
+                ? 'border-primary/40 bg-primary/5'
+                : 'border-dashed border-input hover:bg-muted/30 text-muted-foreground'}"
+            >
+              <div
+                class="h-8 w-8 rounded-md border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0"
+              >
+                <MapPin class="h-4 w-4 text-muted-foreground/50" />
+              </div>
+              <span class="text-xs font-medium">Ввести нову адресу</span>
+              {#if selectedPropertyId === ''}
+                <Check class="h-4 w-4 text-primary shrink-0 ml-auto" />
+              {/if}
+            </button>
+          </div>
+
+          <!-- Поле нової адреси — тільки якщо вибрали "нова" -->
+          {#if selectedPropertyId === ''}
+            <div class="relative">
+              <MapPin
+                class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+              />
+              <Input
+                bind:value={address}
+                placeholder="вул. Хрещатик, 22, кв. 45"
+                class="h-9 pl-9 text-sm {errors.address
+                  ? 'border-destructive focus-visible:ring-destructive'
+                  : ''}"
+                oninput={() => (errors = { ...errors, address: '' })}
+              />
+            </div>
+          {/if}
+        {:else}
+          <!-- Немає збережених адрес або клієнт не вибраний -->
+          <div class="relative">
+            <MapPin
+              class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              bind:value={address}
+              placeholder={selectedCustomer
+                ? 'вул. Хрещатик, 22, кв. 45'
+                : 'Спочатку оберіть клієнта...'}
+              disabled={!selectedCustomer}
+              class="h-9 pl-9 text-sm {errors.address
+                ? 'border-destructive focus-visible:ring-destructive'
+                : ''}"
+              oninput={() => (errors = { ...errors, address: '' })}
+            />
+          </div>
+          {#if selectedCustomer && customerProperties.length === 0}
+            <p class="text-xs text-muted-foreground">
+              У клієнта немає збережених адрес
+            </p>
+          {/if}
+        {/if}
       </div>
     </div>
 
@@ -512,7 +654,6 @@
         {/if}
       </div>
       <div class="p-4 grid grid-cols-2 gap-3">
-        <!-- Дата -->
         <div class="space-y-1.5">
           <Label class="text-xs text-muted-foreground">Дата</Label>
           <Popover.Root bind:open={calendarOpen}>
@@ -522,7 +663,7 @@
                   {...props}
                   class="cursor-pointer flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 text-sm shadow-sm transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring {errors.date
                     ? 'border-destructive'
-                    : ''} {!scheduledDate ? 'text-muted-foreground' : ''}"
+                    : ''}"
                 >
                   <span class="flex items-center gap-2">
                     <CalendarIcon class="h-3.5 w-3.5 text-muted-foreground" />
@@ -545,8 +686,6 @@
             </Popover.Content>
           </Popover.Root>
         </div>
-
-        <!-- Час -->
         <div class="space-y-1.5">
           <Label class="text-xs text-muted-foreground">Час початку</Label>
           <div class="relative">
@@ -573,7 +712,6 @@
         >
       </div>
       <div class="p-4 space-y-3">
-        <!-- Тип -->
         <div class="space-y-1.5">
           <Label class="text-xs text-muted-foreground">Тип прибирання</Label>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -590,8 +728,6 @@
             {/each}
           </div>
         </div>
-
-        <!-- Сума -->
         <div class="space-y-1.5">
           <Label class="text-xs text-muted-foreground">Сума (₴)</Label>
           <div class="relative">
@@ -643,12 +779,11 @@
           </p>
         {:else}
           <div class="grid grid-cols-1 gap-1.5">
-            <!-- Опція "без клінера" -->
             <button
               onclick={() => (cleanerId = '')}
               class="cursor-pointer flex items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all text-left
                 {cleanerId === ''
-                ? 'border-muted-foreground/30 bg-muted/40 text-foreground'
+                ? 'border-muted-foreground/30 bg-muted/40'
                 : 'border-transparent text-muted-foreground hover:bg-muted/20'}"
             >
               <div
@@ -657,17 +792,16 @@
                 <X class="h-3 w-3 text-muted-foreground/40" />
               </div>
               <span class="text-xs">Без клінера</span>
-              {#if cleanerId === ''}
-                <Check class="h-3.5 w-3.5 ml-auto text-muted-foreground" />
-              {/if}
+              {#if cleanerId === ''}<Check
+                  class="h-3.5 w-3.5 ml-auto text-muted-foreground"
+                />{/if}
             </button>
-
             {#each cleaners as cl}
               <button
                 onclick={() => (cleanerId = cl.id)}
                 class="cursor-pointer flex items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all text-left
                   {cleanerId === cl.id
-                  ? 'border-primary/30 bg-primary/5 text-foreground'
+                  ? 'border-primary/30 bg-primary/5'
                   : 'border-transparent text-muted-foreground hover:bg-muted/20'}"
               >
                 <div
@@ -676,9 +810,9 @@
                   {getInitials(cl.name)}
                 </div>
                 <span class="text-sm font-medium">{cl.name}</span>
-                {#if cleanerId === cl.id}
-                  <Check class="h-3.5 w-3.5 ml-auto text-primary" />
-                {/if}
+                {#if cleanerId === cl.id}<Check
+                    class="h-3.5 w-3.5 ml-auto text-primary"
+                  />{/if}
               </button>
             {/each}
           </div>
@@ -703,7 +837,7 @@
       <div class="p-4">
         <Textarea
           bind:value={notes}
-          placeholder="Особливі побажання, код домофону, є собака, ключ під килимком..."
+          placeholder="Особливі побажання, код домофону, є собака..."
           rows={3}
           class="resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
         />
@@ -721,7 +855,7 @@
       </div>
       <div class="p-4">
         <dl class="space-y-2.5">
-          {#each [{ label: 'Клієнт', value: selectedCustomer?.name ?? '—' }, { label: 'Телефон', value: selectedCustomer?.phone ?? '—' }, { label: 'Адреса', value: address || '—' }, { label: 'Дата', value: `${formatDate(scheduledDate)}, ${scheduledTime}` }, { label: 'Тип', value: selectedTypeName || '—' }, { label: 'Клінер', value: selectedCleanerName || 'Не призначено' }, { label: 'Сума', value: `${totalAmount === '' ? '0' : Number(totalAmount).toLocaleString('uk-UA')} ₴` }] as row}
+          {#each [{ label: 'Клієнт', value: selectedCustomer?.name ?? '—' }, { label: 'Телефон', value: selectedCustomer?.phone ?? '—' }, { label: 'Адреса', value: effectiveAddress || '—' }, { label: 'Дата', value: `${formatDate(scheduledDate)}, ${scheduledTime}` }, { label: 'Тип', value: selectedTypeName || '—' }, { label: 'Клінер', value: selectedCleanerName || 'Не призначено' }, { label: 'Сума', value: `${totalAmount === '' ? '0' : Number(totalAmount).toLocaleString('uk-UA')} ₴` }] as row}
             <div class="flex items-baseline justify-between gap-4">
               <dt class="text-xs text-muted-foreground shrink-0">
                 {row.label}
@@ -735,7 +869,7 @@
       </div>
     </div>
 
-    <!-- ════ КНОПКА (тільки одна!) ═════════════════════════ -->
+    <!-- ════ КНОПКА ═══════════════════════════════════════ -->
     <div class="pb-8">
       <Button
         class="w-full h-11 text-sm font-medium cursor-pointer gap-2"
@@ -748,8 +882,7 @@
           ></span>
           Створення замовлення...
         {:else}
-          <Save class="h-4 w-4" />
-          Створити замовлення
+          <Save class="h-4 w-4" />Створити замовлення
         {/if}
       </Button>
     </div>

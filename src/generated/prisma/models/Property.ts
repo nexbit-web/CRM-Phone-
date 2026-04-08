@@ -27,11 +27,13 @@ export type AggregateProperty = {
 }
 
 export type PropertyAvgAggregateOutputType = {
+  floor: number | null
   area: number | null
   rooms: number | null
 }
 
 export type PropertySumAggregateOutputType = {
+  floor: number | null
   area: number | null
   rooms: number | null
 }
@@ -39,11 +41,13 @@ export type PropertySumAggregateOutputType = {
 export type PropertyMinAggregateOutputType = {
   id: string | null
   customerId: string | null
-  address: string | null
+  street: string | null
+  apt: string | null
+  floor: number | null
   city: string | null
+  type: $Enums.PropertyType | null
   area: number | null
   rooms: number | null
-  type: string | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,11 +56,13 @@ export type PropertyMinAggregateOutputType = {
 export type PropertyMaxAggregateOutputType = {
   id: string | null
   customerId: string | null
-  address: string | null
+  street: string | null
+  apt: string | null
+  floor: number | null
   city: string | null
+  type: $Enums.PropertyType | null
   area: number | null
   rooms: number | null
-  type: string | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -65,11 +71,13 @@ export type PropertyMaxAggregateOutputType = {
 export type PropertyCountAggregateOutputType = {
   id: number
   customerId: number
-  address: number
+  street: number
+  apt: number
+  floor: number
   city: number
+  type: number
   area: number
   rooms: number
-  type: number
   notes: number
   createdAt: number
   updatedAt: number
@@ -78,11 +86,13 @@ export type PropertyCountAggregateOutputType = {
 
 
 export type PropertyAvgAggregateInputType = {
+  floor?: true
   area?: true
   rooms?: true
 }
 
 export type PropertySumAggregateInputType = {
+  floor?: true
   area?: true
   rooms?: true
 }
@@ -90,11 +100,13 @@ export type PropertySumAggregateInputType = {
 export type PropertyMinAggregateInputType = {
   id?: true
   customerId?: true
-  address?: true
+  street?: true
+  apt?: true
+  floor?: true
   city?: true
+  type?: true
   area?: true
   rooms?: true
-  type?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -103,11 +115,13 @@ export type PropertyMinAggregateInputType = {
 export type PropertyMaxAggregateInputType = {
   id?: true
   customerId?: true
-  address?: true
+  street?: true
+  apt?: true
+  floor?: true
   city?: true
+  type?: true
   area?: true
   rooms?: true
-  type?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -116,11 +130,13 @@ export type PropertyMaxAggregateInputType = {
 export type PropertyCountAggregateInputType = {
   id?: true
   customerId?: true
-  address?: true
+  street?: true
+  apt?: true
+  floor?: true
   city?: true
+  type?: true
   area?: true
   rooms?: true
-  type?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
@@ -216,11 +232,13 @@ export type PropertyGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type PropertyGroupByOutputType = {
   id: string
   customerId: string
-  address: string
+  street: string
+  apt: string | null
+  floor: number | null
   city: string
+  type: $Enums.PropertyType
   area: number | null
   rooms: number | null
-  type: string | null
   notes: string | null
   createdAt: Date
   updatedAt: Date
@@ -252,11 +270,13 @@ export type PropertyWhereInput = {
   NOT?: Prisma.PropertyWhereInput | Prisma.PropertyWhereInput[]
   id?: Prisma.StringFilter<"Property"> | string
   customerId?: Prisma.StringFilter<"Property"> | string
-  address?: Prisma.StringFilter<"Property"> | string
+  street?: Prisma.StringFilter<"Property"> | string
+  apt?: Prisma.StringNullableFilter<"Property"> | string | null
+  floor?: Prisma.IntNullableFilter<"Property"> | number | null
   city?: Prisma.StringFilter<"Property"> | string
+  type?: Prisma.EnumPropertyTypeFilter<"Property"> | $Enums.PropertyType
   area?: Prisma.IntNullableFilter<"Property"> | number | null
   rooms?: Prisma.IntNullableFilter<"Property"> | number | null
-  type?: Prisma.StringNullableFilter<"Property"> | string | null
   notes?: Prisma.StringNullableFilter<"Property"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Property"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Property"> | Date | string
@@ -267,11 +287,13 @@ export type PropertyWhereInput = {
 export type PropertyOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
-  address?: Prisma.SortOrder
+  street?: Prisma.SortOrder
+  apt?: Prisma.SortOrderInput | Prisma.SortOrder
+  floor?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   area?: Prisma.SortOrderInput | Prisma.SortOrder
   rooms?: Prisma.SortOrderInput | Prisma.SortOrder
-  type?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -285,11 +307,13 @@ export type PropertyWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PropertyWhereInput[]
   NOT?: Prisma.PropertyWhereInput | Prisma.PropertyWhereInput[]
   customerId?: Prisma.StringFilter<"Property"> | string
-  address?: Prisma.StringFilter<"Property"> | string
+  street?: Prisma.StringFilter<"Property"> | string
+  apt?: Prisma.StringNullableFilter<"Property"> | string | null
+  floor?: Prisma.IntNullableFilter<"Property"> | number | null
   city?: Prisma.StringFilter<"Property"> | string
+  type?: Prisma.EnumPropertyTypeFilter<"Property"> | $Enums.PropertyType
   area?: Prisma.IntNullableFilter<"Property"> | number | null
   rooms?: Prisma.IntNullableFilter<"Property"> | number | null
-  type?: Prisma.StringNullableFilter<"Property"> | string | null
   notes?: Prisma.StringNullableFilter<"Property"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Property"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Property"> | Date | string
@@ -300,11 +324,13 @@ export type PropertyWhereUniqueInput = Prisma.AtLeast<{
 export type PropertyOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
-  address?: Prisma.SortOrder
+  street?: Prisma.SortOrder
+  apt?: Prisma.SortOrderInput | Prisma.SortOrder
+  floor?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   area?: Prisma.SortOrderInput | Prisma.SortOrder
   rooms?: Prisma.SortOrderInput | Prisma.SortOrder
-  type?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -321,11 +347,13 @@ export type PropertyScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PropertyScalarWhereWithAggregatesInput | Prisma.PropertyScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Property"> | string
   customerId?: Prisma.StringWithAggregatesFilter<"Property"> | string
-  address?: Prisma.StringWithAggregatesFilter<"Property"> | string
+  street?: Prisma.StringWithAggregatesFilter<"Property"> | string
+  apt?: Prisma.StringNullableWithAggregatesFilter<"Property"> | string | null
+  floor?: Prisma.IntNullableWithAggregatesFilter<"Property"> | number | null
   city?: Prisma.StringWithAggregatesFilter<"Property"> | string
+  type?: Prisma.EnumPropertyTypeWithAggregatesFilter<"Property"> | $Enums.PropertyType
   area?: Prisma.IntNullableWithAggregatesFilter<"Property"> | number | null
   rooms?: Prisma.IntNullableWithAggregatesFilter<"Property"> | number | null
-  type?: Prisma.StringNullableWithAggregatesFilter<"Property"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Property"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Property"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Property"> | Date | string
@@ -333,11 +361,13 @@ export type PropertyScalarWhereWithAggregatesInput = {
 
 export type PropertyCreateInput = {
   id?: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -348,11 +378,13 @@ export type PropertyCreateInput = {
 export type PropertyUncheckedCreateInput = {
   id?: string
   customerId: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -361,11 +393,13 @@ export type PropertyUncheckedCreateInput = {
 
 export type PropertyUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,11 +410,13 @@ export type PropertyUpdateInput = {
 export type PropertyUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -390,11 +426,13 @@ export type PropertyUncheckedUpdateInput = {
 export type PropertyCreateManyInput = {
   id?: string
   customerId: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -402,11 +440,13 @@ export type PropertyCreateManyInput = {
 
 export type PropertyUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -415,11 +455,13 @@ export type PropertyUpdateManyMutationInput = {
 export type PropertyUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,17 +480,20 @@ export type PropertyOrderByRelationAggregateInput = {
 export type PropertyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
-  address?: Prisma.SortOrder
+  street?: Prisma.SortOrder
+  apt?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   area?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type PropertyAvgOrderByAggregateInput = {
+  floor?: Prisma.SortOrder
   area?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
 }
@@ -456,11 +501,13 @@ export type PropertyAvgOrderByAggregateInput = {
 export type PropertyMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
-  address?: Prisma.SortOrder
+  street?: Prisma.SortOrder
+  apt?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   area?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -469,17 +516,20 @@ export type PropertyMaxOrderByAggregateInput = {
 export type PropertyMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customerId?: Prisma.SortOrder
-  address?: Prisma.SortOrder
+  street?: Prisma.SortOrder
+  apt?: Prisma.SortOrder
+  floor?: Prisma.SortOrder
   city?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   area?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  type?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type PropertySumOrderByAggregateInput = {
+  floor?: Prisma.SortOrder
   area?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
 }
@@ -539,6 +589,10 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumPropertyTypeFieldUpdateOperationsInput = {
+  set?: $Enums.PropertyType
+}
+
 export type PropertyCreateNestedOneWithoutOrdersInput = {
   create?: Prisma.XOR<Prisma.PropertyCreateWithoutOrdersInput, Prisma.PropertyUncheckedCreateWithoutOrdersInput>
   connectOrCreate?: Prisma.PropertyCreateOrConnectWithoutOrdersInput
@@ -555,11 +609,13 @@ export type PropertyUpdateOneRequiredWithoutOrdersNestedInput = {
 
 export type PropertyCreateWithoutCustomerInput = {
   id?: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -568,11 +624,13 @@ export type PropertyCreateWithoutCustomerInput = {
 
 export type PropertyUncheckedCreateWithoutCustomerInput = {
   id?: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -611,11 +669,13 @@ export type PropertyScalarWhereInput = {
   NOT?: Prisma.PropertyScalarWhereInput | Prisma.PropertyScalarWhereInput[]
   id?: Prisma.StringFilter<"Property"> | string
   customerId?: Prisma.StringFilter<"Property"> | string
-  address?: Prisma.StringFilter<"Property"> | string
+  street?: Prisma.StringFilter<"Property"> | string
+  apt?: Prisma.StringNullableFilter<"Property"> | string | null
+  floor?: Prisma.IntNullableFilter<"Property"> | number | null
   city?: Prisma.StringFilter<"Property"> | string
+  type?: Prisma.EnumPropertyTypeFilter<"Property"> | $Enums.PropertyType
   area?: Prisma.IntNullableFilter<"Property"> | number | null
   rooms?: Prisma.IntNullableFilter<"Property"> | number | null
-  type?: Prisma.StringNullableFilter<"Property"> | string | null
   notes?: Prisma.StringNullableFilter<"Property"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Property"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Property"> | Date | string
@@ -623,11 +683,13 @@ export type PropertyScalarWhereInput = {
 
 export type PropertyCreateWithoutOrdersInput = {
   id?: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -637,11 +699,13 @@ export type PropertyCreateWithoutOrdersInput = {
 export type PropertyUncheckedCreateWithoutOrdersInput = {
   id?: string
   customerId: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -665,11 +729,13 @@ export type PropertyUpdateToOneWithWhereWithoutOrdersInput = {
 
 export type PropertyUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -679,11 +745,13 @@ export type PropertyUpdateWithoutOrdersInput = {
 export type PropertyUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customerId?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -691,11 +759,13 @@ export type PropertyUncheckedUpdateWithoutOrdersInput = {
 
 export type PropertyCreateManyCustomerInput = {
   id?: string
-  address: string
+  street: string
+  apt?: string | null
+  floor?: number | null
   city?: string
+  type?: $Enums.PropertyType
   area?: number | null
   rooms?: number | null
-  type?: string | null
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -703,11 +773,13 @@ export type PropertyCreateManyCustomerInput = {
 
 export type PropertyUpdateWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -716,11 +788,13 @@ export type PropertyUpdateWithoutCustomerInput = {
 
 export type PropertyUncheckedUpdateWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -729,11 +803,13 @@ export type PropertyUncheckedUpdateWithoutCustomerInput = {
 
 export type PropertyUncheckedUpdateManyWithoutCustomerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  address?: Prisma.StringFieldUpdateOperationsInput | string
+  street?: Prisma.StringFieldUpdateOperationsInput | string
+  apt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  floor?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   city?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumPropertyTypeFieldUpdateOperationsInput | $Enums.PropertyType
   area?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -773,11 +849,13 @@ export type PropertyCountOutputTypeCountOrdersArgs<ExtArgs extends runtime.Types
 export type PropertySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   customerId?: boolean
-  address?: boolean
+  street?: boolean
+  apt?: boolean
+  floor?: boolean
   city?: boolean
+  type?: boolean
   area?: boolean
   rooms?: boolean
-  type?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -789,11 +867,13 @@ export type PropertySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type PropertySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   customerId?: boolean
-  address?: boolean
+  street?: boolean
+  apt?: boolean
+  floor?: boolean
   city?: boolean
+  type?: boolean
   area?: boolean
   rooms?: boolean
-  type?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -803,11 +883,13 @@ export type PropertySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type PropertySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   customerId?: boolean
-  address?: boolean
+  street?: boolean
+  apt?: boolean
+  floor?: boolean
   city?: boolean
+  type?: boolean
   area?: boolean
   rooms?: boolean
-  type?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -817,17 +899,19 @@ export type PropertySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 export type PropertySelectScalar = {
   id?: boolean
   customerId?: boolean
-  address?: boolean
+  street?: boolean
+  apt?: boolean
+  floor?: boolean
   city?: boolean
+  type?: boolean
   area?: boolean
   rooms?: boolean
-  type?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "address" | "city" | "area" | "rooms" | "type" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["property"]>
+export type PropertyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "street" | "apt" | "floor" | "city" | "type" | "area" | "rooms" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["property"]>
 export type PropertyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   orders?: boolean | Prisma.Property$ordersArgs<ExtArgs>
@@ -849,11 +933,13 @@ export type $PropertyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     customerId: string
-    address: string
+    street: string
+    apt: string | null
+    floor: number | null
     city: string
+    type: $Enums.PropertyType
     area: number | null
     rooms: number | null
-    type: string | null
     notes: string | null
     createdAt: Date
     updatedAt: Date
@@ -1284,11 +1370,13 @@ export interface Prisma__PropertyClient<T, Null = never, ExtArgs extends runtime
 export interface PropertyFieldRefs {
   readonly id: Prisma.FieldRef<"Property", 'String'>
   readonly customerId: Prisma.FieldRef<"Property", 'String'>
-  readonly address: Prisma.FieldRef<"Property", 'String'>
+  readonly street: Prisma.FieldRef<"Property", 'String'>
+  readonly apt: Prisma.FieldRef<"Property", 'String'>
+  readonly floor: Prisma.FieldRef<"Property", 'Int'>
   readonly city: Prisma.FieldRef<"Property", 'String'>
+  readonly type: Prisma.FieldRef<"Property", 'PropertyType'>
   readonly area: Prisma.FieldRef<"Property", 'Int'>
   readonly rooms: Prisma.FieldRef<"Property", 'Int'>
-  readonly type: Prisma.FieldRef<"Property", 'String'>
   readonly notes: Prisma.FieldRef<"Property", 'String'>
   readonly createdAt: Prisma.FieldRef<"Property", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Property", 'DateTime'>

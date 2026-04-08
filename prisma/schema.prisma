@@ -6,8 +6,11 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+// npx prisma migrate dev --name init
 // npx prisma generate
-// npx prisma migrate dev --name small_update
+
+// npx prisma generate
+// npx prisma migrate reset
 // npx prisma generate
 // =============================================
 // BETTER AUTH МОДЕЛІ (залишаємо без змін)
@@ -111,37 +114,53 @@ enum ReminderStatus {
 // Клієнт — фізична або юридична особа, яка замовляє уборку
 // ———————————————————————————————————————————————
 model Customer {
-  id          String   @id @default(cuid())
-  name        String
-  phone       String   @unique
-  email       String?
-  companyName String?
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  email     String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  properties  Property[]
-  orders      Order[]
+  properties Property[]
+  orders     Order[]
+}
+
+enum PropertyType {
+  APARTMENT   // Квартира
+  HOUSE       // Приватний будинок
+  OFFICE      // Офіс
+  COMMERCIAL  // Комерційне приміщення
+  OTHER       // Інше
 }
 
 // ———————————————————————————————————————————————
-// Об'єкт нерухомості (квартира, офіс, будинок тощо)
+// Об'єкт нерухомості (де виконується прибирання)
 // ———————————————————————————————————————————————
 model Property {
-  id          String   @id @default(cuid())
-  customerId  String
-  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  id         String       @id @default(cuid())
+  customerId String
+  customer   Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  address     String
-  city        String   @default("Київ")
-  area        Int?     // площа в м²
-  rooms       Int?
-  type        String?
-  notes       String?
+  // Адреса
+  street     String       // вул. Хрещатик, 22
+  apt        String?      // квартира або номер офісу
+  floor      Int?         // поверх
+  city       String       @default("Київ")
 
-  orders      Order[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  // Характеристики об'єкта
+  type       PropertyType @default(APARTMENT)
+  area       Int?         // площа в м²
+  rooms      Int?         // кількість кімнат
+
+  notes      String?
+
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Повна адреса для відображення (обчислювана через @@index або хелпер)
+  @@index([customerId])
 }
 
 // ———————————————————————————————————————————————

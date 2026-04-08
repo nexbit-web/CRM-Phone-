@@ -50,3 +50,14 @@ export const ReminderStatus = {
 } as const
 
 export type ReminderStatus = (typeof ReminderStatus)[keyof typeof ReminderStatus]
+
+
+export const PropertyType = {
+  APARTMENT: 'APARTMENT',
+  HOUSE: 'HOUSE',
+  OFFICE: 'OFFICE',
+  COMMERCIAL: 'COMMERCIAL',
+  OTHER: 'OTHER'
+} as const
+
+export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType]

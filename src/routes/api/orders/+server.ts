@@ -4,47 +4,9 @@ import { auth } from '$lib/auth'
 import { z } from 'zod'
 import type { RequestHandler } from './$types'
 
-// ====================== ZOD СХЕМА (сумісна з zod v4) ======================
-const CreateOrderSchema = z.object({
-  customerName: z
-    .string()
-    .min(2, "Ім'я має бути не менше 2 символів")
-    .max(100, "Ім'я занадто довге")
-    .trim(),
-
-  customerPhone: z
-    .string()
-    .regex(/^\+?[\d\s\-()]{7,20}$/, 'Невірний формат телефону')
-    .trim(),
-
-  address: z
-    .string()
-    .min(5, 'Адреса занадто коротка')
-    .max(300, 'Адреса занадто довга')
-    .trim(),
-
-  scheduledDate: z.string().datetime({ message: 'Невірний формат дати' }),
-
-  notes: z
-    .string()
-    .max(1000, 'Нотатки занадто довгі')
-    .trim()
-    .optional()
-    .default(''),
-
-  totalAmount: z
-    .number({ error: 'Сума має бути числом' })
-    .nonnegative("Сума не може бути від'ємною")
-    .max(1_000_000, 'Сума занадто велика')
-    .optional()
-    .default(0),
-})
-
-// ====================== GET - Список замовлень ======================
+// ── GET: список замовлень ────────────────────────────────
 export const GET: RequestHandler = async ({ request }) => {
-  // ✅ Перевірка авторизації
   const session = await auth.api.getSession({ headers: request.headers })
-
   if (!session?.user) {
     return json({ success: false, error: 'Не авторизований' }, { status: 401 })
   }
@@ -54,16 +16,11 @@ export const GET: RequestHandler = async ({ request }) => {
       include: {
         customer: true,
         property: true,
-        cleaner: {
-          select: { id: true, name: true, image: true },
-        },
-        items: {
-          include: { service: true },
-        },
+        cleaner: { select: { id: true, name: true, image: true } },
+        items: { include: { service: true } },
       },
       orderBy: { scheduledDate: 'desc' },
     })
-
     return json({ success: true, orders })
   } catch (error) {
     console.error('Помилка отримання замовлень:', error)
@@ -74,12 +31,25 @@ export const GET: RequestHandler = async ({ request }) => {
   }
 }
 
-// ====================== POST - Створення нового замовлення ======================
+// ── Zod схема ────────────────────────────────────────────
+const CreateOrderSchema = z.object({
+  customerName: z.string().min(2).max(100).trim(),
+  customerPhone: z.string().min(7).max(25).trim(),
+  // Підтримуємо обидва варіанти: address (стара) і street (нова схема)
+  address: z.string().min(3).max(300).trim().optional(),
+  street: z.string().min(3).max(300).trim().optional(),
+  propertyId: z.string().optional(), // якщо передаємо готовий ID
+  scheduledDate: z.string(),
+  notes: z.string().max(1000).trim().optional().default(''),
+  totalAmount: z.number().nonnegative().max(1_000_000).optional().default(0),
+  cleanerId: z.string().optional(),
+  cleaningType: z.string().optional(),
+})
+
+// ── POST: створення замовлення ───────────────────────────
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    // ✅ Перевірка авторизації
     const session = await auth.api.getSession({ headers: request.headers })
-
     if (!session?.user) {
       return json(
         { success: false, error: 'Не авторизований' },
@@ -88,59 +58,75 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const body = await request.json()
-
-    // ✅ Zod валідація
     const parsed = CreateOrderSchema.safeParse(body)
 
     if (!parsed.success) {
-      const firstError = parsed.error.issues[0].message
-      return json({ success: false, error: firstError }, { status: 400 })
+      console.error('Zod errors:', parsed.error.issues)
+      return json(
+        { success: false, error: parsed.error.issues[0].message },
+        { status: 400 },
+      )
     }
 
     const {
       customerName,
       customerPhone,
       address,
+      street,
+      propertyId,
       scheduledDate,
       notes,
       totalAmount,
+      cleanerId,
     } = parsed.data
 
-    // ✅ Транзакція — всі кроки або виконуються, або відкочуються
+    // street або address — береємо що прийшло
+    const streetValue = (street ?? address ?? '').trim()
+
+    if (!streetValue && !propertyId) {
+      return json(
+        { success: false, error: "Вкажіть адресу або оберіть об'єкт" },
+        { status: 400 },
+      )
+    }
+
     const newOrder = await prisma.$transaction(async (tx) => {
-      // Знаходимо або створюємо клієнта
+      // 1. Клієнт
       let customer = await tx.customer.findUnique({
         where: { phone: customerPhone },
       })
-
       if (!customer) {
         customer = await tx.customer.create({
-          data: {
-            name: customerName,
-            phone: customerPhone,
-          },
+          data: { name: customerName, phone: customerPhone },
         })
       }
 
-      // Знаходимо або створюємо об'єкт нерухомості
-      let property = await tx.property.findFirst({
-        where: {
-          customerId: customer.id,
-          address: { contains: address, mode: 'insensitive' },
-        },
-      })
-
-      if (!property) {
-        property = await tx.property.create({
-          data: {
+      // 2. Об'єкт нерухомості
+      let property
+      if (propertyId) {
+        // Якщо передали готовий ID — використовуємо його
+        property = await tx.property.findUnique({ where: { id: propertyId } })
+        if (!property) throw new Error("Об'єкт не знайдено")
+      } else {
+        // ✅ Шукаємо по street (нова схема)
+        property = await tx.property.findFirst({
+          where: {
             customerId: customer.id,
-            address: address,
-            city: 'Київ',
+            street: { contains: streetValue, mode: 'insensitive' },
           },
         })
+        if (!property) {
+          // ✅ Створюємо з полем street (нова схема)
+          property = await tx.property.create({
+            data: {
+              customerId: customer.id,
+              street: streetValue,
+              city: 'Київ',
+            },
+          })
+        }
       }
 
-      // Створюємо замовлення
       return tx.order.create({
         data: {
           scheduledDate: new Date(scheduledDate),
@@ -148,14 +134,12 @@ export const POST: RequestHandler = async ({ request }) => {
           paymentStatus: 'UNPAID',
           customerId: customer.id,
           propertyId: property.id,
-          totalAmount: totalAmount,
-          notes: notes,
+          totalAmount: Number(totalAmount),
+          notes: notes.trim(),
           createdById: session.user.id,
+          ...(cleanerId ? { cleanerId } : {}),
         },
-        include: {
-          customer: true,
-          property: true,
-        },
+        include: { customer: true, property: true },
       })
     })
 
