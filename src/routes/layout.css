@@ -40,6 +40,22 @@
 
   --sidebar-bg-active: oklch(0.648 0.2 131.684);
   --sidebar-text-active: oklch(100% 0.00011 271.152);
+
+  --cal-amber-bg: #fffbeb;
+  --cal-amber-text: #92400e;
+  --cal-amber-border: #fde68a;
+  --cal-sky-bg: #f0f9ff;
+  --cal-sky-text: #0c4a6e;
+  --cal-sky-border: #bae6fd;
+  --cal-violet-bg: #f5f3ff;
+  --cal-violet-text: #4c1d95;
+  --cal-violet-border: #ddd6fe;
+  --cal-emerald-bg: #ecfdf5;
+  --cal-emerald-text: #065f46;
+  --cal-emerald-border: #a7f3d0;
+  --cal-muted-bg: #f9fafb;
+  --cal-muted-text: #6b7280;
+  --cal-muted-border: #e5e7eb;
 }
 
 .dark {
@@ -77,6 +93,22 @@
 
   --sidebar-bg-active: oklch(0.648 0.2 131.684);
   --sidebar-text-active: oklch(100% 0.00011 271.152);
+
+  --cal-amber-bg: rgba(120, 53, 15, 0.35);
+  --cal-amber-text: #fcd34d;
+  --cal-amber-border: rgba(180, 83, 9, 0.5);
+  --cal-sky-bg: rgba(7, 89, 133, 0.35);
+  --cal-sky-text: #7dd3fc;
+  --cal-sky-border: rgba(14, 116, 144, 0.5);
+  --cal-violet-bg: rgba(76, 29, 149, 0.35);
+  --cal-violet-text: #c4b5fd;
+  --cal-violet-border: rgba(109, 40, 217, 0.5);
+  --cal-emerald-bg: rgba(6, 78, 59, 0.35);
+  --cal-emerald-text: #6ee7b7;
+  --cal-emerald-border: rgba(16, 185, 129, 0.5);
+  --cal-muted-bg: rgba(30, 30, 30, 0.4);
+  --cal-muted-text: #9ca3af;
+  --cal-muted-border: rgba(75, 85, 99, 0.4);
 }
 
 @theme inline {
@@ -238,4 +270,55 @@
 #nprogress {
   position: fixed;
   z-index: 99999;
+}
+
+/* !!!!! */
+
+.order-badge {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 2px 5px;
+  height: auto;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: 5px;
+  border-width: 0.5px;
+  cursor: pointer;
+  overflow: hidden;
+}
+.order-badge:hover {
+  opacity: 0.7;
+}
+.dot-pulse {
+  animation: cal-pulse 1.5s infinite;
+}
+@keyframes cal-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (max-width: 480px) {
+  .cal-cell {
+    min-height: 64px !important;
+    padding: 4px !important;
+  }
+}
+@media (max-width: 400px) {
+  .badge-name {
+    display: none;
+  }
+  .stats-block {
+    display: none;
+  }
+}
+@media (max-width: 340px) {
+  .badge-time {
+    display: none;
+  }
 }
