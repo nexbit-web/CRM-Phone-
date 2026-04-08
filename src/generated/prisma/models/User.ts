@@ -240,6 +240,10 @@ export type UserWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdOrders?: Prisma.OrderListRelationFilter
   assignedOrders?: Prisma.OrderListRelationFilter
+  workerOrders?: Prisma.OrderWorkerListRelationFilter
+  expenses?: Prisma.ExpenseListRelationFilter
+  createdExpenses?: Prisma.ExpenseListRelationFilter
+  workerStats?: Prisma.WorkerMonthlyStatListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }
@@ -259,6 +263,10 @@ export type UserOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   createdOrders?: Prisma.OrderOrderByRelationAggregateInput
   assignedOrders?: Prisma.OrderOrderByRelationAggregateInput
+  workerOrders?: Prisma.OrderWorkerOrderByRelationAggregateInput
+  expenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  createdExpenses?: Prisma.ExpenseOrderByRelationAggregateInput
+  workerStats?: Prisma.WorkerMonthlyStatOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
 }
@@ -281,6 +289,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdOrders?: Prisma.OrderListRelationFilter
   assignedOrders?: Prisma.OrderListRelationFilter
+  workerOrders?: Prisma.OrderWorkerListRelationFilter
+  expenses?: Prisma.ExpenseListRelationFilter
+  createdExpenses?: Prisma.ExpenseListRelationFilter
+  workerStats?: Prisma.WorkerMonthlyStatListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
 }, "id" | "email">
@@ -336,6 +348,10 @@ export type UserCreateInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
@@ -355,6 +371,10 @@ export type UserUncheckedCreateInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
@@ -374,6 +394,10 @@ export type UserUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
@@ -393,6 +417,10 @@ export type UserUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -575,6 +603,64 @@ export type UserUpdateOneRequiredWithoutCreatedOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedOrdersInput, Prisma.UserUpdateWithoutCreatedOrdersInput>, Prisma.UserUncheckedUpdateWithoutCreatedOrdersInput>
 }
 
+export type UserCreateNestedOneWithoutWorkerOrdersInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkerOrdersInput, Prisma.UserUncheckedCreateWithoutWorkerOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkerOrdersInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWorkerOrdersNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkerOrdersInput, Prisma.UserUncheckedCreateWithoutWorkerOrdersInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkerOrdersInput
+  upsert?: Prisma.UserUpsertWithoutWorkerOrdersInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkerOrdersInput, Prisma.UserUpdateWithoutWorkerOrdersInput>, Prisma.UserUncheckedUpdateWithoutWorkerOrdersInput>
+}
+
+export type UserCreateNestedOneWithoutExpensesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExpensesInput, Prisma.UserUncheckedCreateWithoutExpensesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExpensesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutCreatedExpensesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedExpensesInput, Prisma.UserUncheckedCreateWithoutCreatedExpensesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedExpensesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutExpensesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutExpensesInput, Prisma.UserUncheckedCreateWithoutExpensesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutExpensesInput
+  upsert?: Prisma.UserUpsertWithoutExpensesInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutExpensesInput, Prisma.UserUpdateWithoutExpensesInput>, Prisma.UserUncheckedUpdateWithoutExpensesInput>
+}
+
+export type UserUpdateOneRequiredWithoutCreatedExpensesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedExpensesInput, Prisma.UserUncheckedCreateWithoutCreatedExpensesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedExpensesInput
+  upsert?: Prisma.UserUpsertWithoutCreatedExpensesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedExpensesInput, Prisma.UserUpdateWithoutCreatedExpensesInput>, Prisma.UserUncheckedUpdateWithoutCreatedExpensesInput>
+}
+
+export type UserCreateNestedOneWithoutWorkerStatsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkerStatsInput, Prisma.UserUncheckedCreateWithoutWorkerStatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkerStatsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWorkerStatsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkerStatsInput, Prisma.UserUncheckedCreateWithoutWorkerStatsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkerStatsInput
+  upsert?: Prisma.UserUpsertWithoutWorkerStatsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkerStatsInput, Prisma.UserUpdateWithoutWorkerStatsInput>, Prisma.UserUncheckedUpdateWithoutWorkerStatsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   name: string
@@ -590,6 +676,10 @@ export type UserCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
 
@@ -608,6 +698,10 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -642,6 +736,10 @@ export type UserUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
 
@@ -660,6 +758,10 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -678,6 +780,10 @@ export type UserCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
 }
 
@@ -696,6 +802,10 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
   assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
 }
 
@@ -730,6 +840,10 @@ export type UserUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
 }
 
@@ -748,6 +862,10 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
   assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -765,6 +883,10 @@ export type UserCreateWithoutAssignedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
@@ -783,6 +905,10 @@ export type UserUncheckedCreateWithoutAssignedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
@@ -806,6 +932,10 @@ export type UserCreateWithoutCreatedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
 }
@@ -824,6 +954,10 @@ export type UserUncheckedCreateWithoutCreatedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
 }
@@ -858,6 +992,10 @@ export type UserUpdateWithoutAssignedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
@@ -876,6 +1014,10 @@ export type UserUncheckedUpdateWithoutAssignedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -905,6 +1047,10 @@ export type UserUpdateWithoutCreatedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
 }
@@ -923,6 +1069,426 @@ export type UserUncheckedUpdateWithoutCreatedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWorkerOrdersInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWorkerOrdersInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWorkerOrdersInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkerOrdersInput, Prisma.UserUncheckedCreateWithoutWorkerOrdersInput>
+}
+
+export type UserUpsertWithoutWorkerOrdersInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWorkerOrdersInput, Prisma.UserUncheckedUpdateWithoutWorkerOrdersInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkerOrdersInput, Prisma.UserUncheckedCreateWithoutWorkerOrdersInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWorkerOrdersInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWorkerOrdersInput, Prisma.UserUncheckedUpdateWithoutWorkerOrdersInput>
+}
+
+export type UserUpdateWithoutWorkerOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWorkerOrdersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutExpensesInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutExpensesInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutExpensesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutExpensesInput, Prisma.UserUncheckedCreateWithoutExpensesInput>
+}
+
+export type UserCreateWithoutCreatedExpensesInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  workerStats?: Prisma.WorkerMonthlyStatCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedExpensesInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedExpensesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedExpensesInput, Prisma.UserUncheckedCreateWithoutCreatedExpensesInput>
+}
+
+export type UserUpsertWithoutExpensesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutExpensesInput, Prisma.UserUncheckedUpdateWithoutExpensesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutExpensesInput, Prisma.UserUncheckedCreateWithoutExpensesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutExpensesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutExpensesInput, Prisma.UserUncheckedUpdateWithoutExpensesInput>
+}
+
+export type UserUpdateWithoutExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutCreatedExpensesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedExpensesInput, Prisma.UserUncheckedUpdateWithoutCreatedExpensesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedExpensesInput, Prisma.UserUncheckedCreateWithoutCreatedExpensesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedExpensesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedExpensesInput, Prisma.UserUncheckedUpdateWithoutCreatedExpensesInput>
+}
+
+export type UserUpdateWithoutCreatedExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedExpensesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  workerStats?: Prisma.WorkerMonthlyStatUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWorkerStatsInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseCreateNestedManyWithoutCreatedByInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWorkerStatsInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  role?: string
+  phone?: string | null
+  banned?: boolean
+  banReason?: string | null
+  banExpires?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  createdOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutCleanerInput
+  workerOrders?: Prisma.OrderWorkerUncheckedCreateNestedManyWithoutUserInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutUserInput
+  createdExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutCreatedByInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWorkerStatsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkerStatsInput, Prisma.UserUncheckedCreateWithoutWorkerStatsInput>
+}
+
+export type UserUpsertWithoutWorkerStatsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWorkerStatsInput, Prisma.UserUncheckedUpdateWithoutWorkerStatsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkerStatsInput, Prisma.UserUncheckedCreateWithoutWorkerStatsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWorkerStatsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWorkerStatsInput, Prisma.UserUncheckedUpdateWithoutWorkerStatsInput>
+}
+
+export type UserUpdateWithoutWorkerStatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUpdateManyWithoutCreatedByNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWorkerStatsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banned?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  banReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  banExpires?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdOrders?: Prisma.OrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedOrders?: Prisma.OrderUncheckedUpdateManyWithoutCleanerNestedInput
+  workerOrders?: Prisma.OrderWorkerUncheckedUpdateManyWithoutUserNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutUserNestedInput
+  createdExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutCreatedByNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -935,6 +1501,10 @@ export type UserUncheckedUpdateWithoutCreatedOrdersInput = {
 export type UserCountOutputType = {
   createdOrders: number
   assignedOrders: number
+  workerOrders: number
+  expenses: number
+  createdExpenses: number
+  workerStats: number
   sessions: number
   accounts: number
 }
@@ -942,6 +1512,10 @@ export type UserCountOutputType = {
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdOrders?: boolean | UserCountOutputTypeCountCreatedOrdersArgs
   assignedOrders?: boolean | UserCountOutputTypeCountAssignedOrdersArgs
+  workerOrders?: boolean | UserCountOutputTypeCountWorkerOrdersArgs
+  expenses?: boolean | UserCountOutputTypeCountExpensesArgs
+  createdExpenses?: boolean | UserCountOutputTypeCountCreatedExpensesArgs
+  workerStats?: boolean | UserCountOutputTypeCountWorkerStatsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
 }
@@ -968,6 +1542,34 @@ export type UserCountOutputTypeCountCreatedOrdersArgs<ExtArgs extends runtime.Ty
  */
 export type UserCountOutputTypeCountAssignedOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountWorkerOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderWorkerWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExpenseWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ExpenseWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountWorkerStatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkerMonthlyStatWhereInput
 }
 
 /**
@@ -1000,6 +1602,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   createdOrders?: boolean | Prisma.User$createdOrdersArgs<ExtArgs>
   assignedOrders?: boolean | Prisma.User$assignedOrdersArgs<ExtArgs>
+  workerOrders?: boolean | Prisma.User$workerOrdersArgs<ExtArgs>
+  expenses?: boolean | Prisma.User$expensesArgs<ExtArgs>
+  createdExpenses?: boolean | Prisma.User$createdExpensesArgs<ExtArgs>
+  workerStats?: boolean | Prisma.User$workerStatsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1054,6 +1660,10 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdOrders?: boolean | Prisma.User$createdOrdersArgs<ExtArgs>
   assignedOrders?: boolean | Prisma.User$assignedOrdersArgs<ExtArgs>
+  workerOrders?: boolean | Prisma.User$workerOrdersArgs<ExtArgs>
+  expenses?: boolean | Prisma.User$expensesArgs<ExtArgs>
+  createdExpenses?: boolean | Prisma.User$createdExpensesArgs<ExtArgs>
+  workerStats?: boolean | Prisma.User$workerStatsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1066,6 +1676,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     createdOrders: Prisma.$OrderPayload<ExtArgs>[]
     assignedOrders: Prisma.$OrderPayload<ExtArgs>[]
+    workerOrders: Prisma.$OrderWorkerPayload<ExtArgs>[]
+    expenses: Prisma.$ExpensePayload<ExtArgs>[]
+    createdExpenses: Prisma.$ExpensePayload<ExtArgs>[]
+    workerStats: Prisma.$WorkerMonthlyStatPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     accounts: Prisma.$AccountPayload<ExtArgs>[]
   }
@@ -1478,6 +2092,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   createdOrders<T extends Prisma.User$createdOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   assignedOrders<T extends Prisma.User$assignedOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workerOrders<T extends Prisma.User$workerOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workerOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderWorkerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  expenses<T extends Prisma.User$expensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$expensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdExpenses<T extends Prisma.User$createdExpensesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdExpensesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ExpensePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workerStats<T extends Prisma.User$workerStatsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workerStatsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkerMonthlyStatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1959,6 +2577,102 @@ export type User$assignedOrdersArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.OrderScalarFieldEnum | Prisma.OrderScalarFieldEnum[]
+}
+
+/**
+ * User.workerOrders
+ */
+export type User$workerOrdersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the OrderWorker
+   */
+  select?: Prisma.OrderWorkerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the OrderWorker
+   */
+  omit?: Prisma.OrderWorkerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderWorkerInclude<ExtArgs> | null
+  where?: Prisma.OrderWorkerWhereInput
+  orderBy?: Prisma.OrderWorkerOrderByWithRelationInput | Prisma.OrderWorkerOrderByWithRelationInput[]
+  cursor?: Prisma.OrderWorkerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.OrderWorkerScalarFieldEnum | Prisma.OrderWorkerScalarFieldEnum[]
+}
+
+/**
+ * User.expenses
+ */
+export type User$expensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Expense
+   */
+  select?: Prisma.ExpenseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Expense
+   */
+  omit?: Prisma.ExpenseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExpenseInclude<ExtArgs> | null
+  where?: Prisma.ExpenseWhereInput
+  orderBy?: Prisma.ExpenseOrderByWithRelationInput | Prisma.ExpenseOrderByWithRelationInput[]
+  cursor?: Prisma.ExpenseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * User.createdExpenses
+ */
+export type User$createdExpensesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Expense
+   */
+  select?: Prisma.ExpenseSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Expense
+   */
+  omit?: Prisma.ExpenseOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ExpenseInclude<ExtArgs> | null
+  where?: Prisma.ExpenseWhereInput
+  orderBy?: Prisma.ExpenseOrderByWithRelationInput | Prisma.ExpenseOrderByWithRelationInput[]
+  cursor?: Prisma.ExpenseWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ExpenseScalarFieldEnum | Prisma.ExpenseScalarFieldEnum[]
+}
+
+/**
+ * User.workerStats
+ */
+export type User$workerStatsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkerMonthlyStat
+   */
+  select?: Prisma.WorkerMonthlyStatSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkerMonthlyStat
+   */
+  omit?: Prisma.WorkerMonthlyStatOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkerMonthlyStatInclude<ExtArgs> | null
+  where?: Prisma.WorkerMonthlyStatWhereInput
+  orderBy?: Prisma.WorkerMonthlyStatOrderByWithRelationInput | Prisma.WorkerMonthlyStatOrderByWithRelationInput[]
+  cursor?: Prisma.WorkerMonthlyStatWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkerMonthlyStatScalarFieldEnum | Prisma.WorkerMonthlyStatScalarFieldEnum[]
 }
 
 /**

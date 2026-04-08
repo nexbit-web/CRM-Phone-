@@ -91,3 +91,38 @@ export type OrderItem = Prisma.OrderItemModel
  * 
  */
 export type ReminderLog = Prisma.ReminderLogModel
+/**
+ * Model OrderWorker
+ * 
+ */
+export type OrderWorker = Prisma.OrderWorkerModel
+/**
+ * Model ExpenseCategory
+ * 
+ */
+export type ExpenseCategory = Prisma.ExpenseCategoryModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model DailyStat
+ * 
+ */
+export type DailyStat = Prisma.DailyStatModel
+/**
+ * Model MonthlyStat
+ * 
+ */
+export type MonthlyStat = Prisma.MonthlyStatModel
+/**
+ * Model WorkerMonthlyStat
+ * 
+ */
+export type WorkerMonthlyStat = Prisma.WorkerMonthlyStatModel

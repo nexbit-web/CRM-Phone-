@@ -61,3 +61,26 @@ export const PropertyType = {
 } as const
 
 export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType]
+
+
+export const ExpenseType = {
+  SALARY: 'SALARY',
+  SUPPLY: 'SUPPLY',
+  TRANSPORT: 'TRANSPORT',
+  EQUIPMENT: 'EQUIPMENT',
+  MARKETING: 'MARKETING',
+  RENT: 'RENT',
+  OTHER: 'OTHER'
+} as const
+
+export type ExpenseType = (typeof ExpenseType)[keyof typeof ExpenseType]
+
+
+export const PaymentMethod = {
+  CASH: 'CASH',
+  CARD: 'CARD',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  OTHER: 'OTHER'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]

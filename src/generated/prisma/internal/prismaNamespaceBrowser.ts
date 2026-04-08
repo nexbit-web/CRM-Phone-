@@ -60,7 +60,14 @@ export const ModelName = {
   CleaningService: 'CleaningService',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  ReminderLog: 'ReminderLog'
+  ReminderLog: 'ReminderLog',
+  OrderWorker: 'OrderWorker',
+  ExpenseCategory: 'ExpenseCategory',
+  Expense: 'Expense',
+  Payment: 'Payment',
+  DailyStat: 'DailyStat',
+  MonthlyStat: 'MonthlyStat',
+  WorkerMonthlyStat: 'WorkerMonthlyStat'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -228,6 +235,97 @@ export const ReminderLogScalarFieldEnum = {
 } as const
 
 export type ReminderLogScalarFieldEnum = (typeof ReminderLogScalarFieldEnum)[keyof typeof ReminderLogScalarFieldEnum]
+
+
+export const OrderWorkerScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  userId: 'userId',
+  role: 'role',
+  hoursWorked: 'hoursWorked',
+  workerPay: 'workerPay',
+  note: 'note'
+} as const
+
+export type OrderWorkerScalarFieldEnum = (typeof OrderWorkerScalarFieldEnum)[keyof typeof OrderWorkerScalarFieldEnum]
+
+
+export const ExpenseCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  type: 'type'
+} as const
+
+export type ExpenseCategoryScalarFieldEnum = (typeof ExpenseCategoryScalarFieldEnum)[keyof typeof ExpenseCategoryScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  date: 'date',
+  description: 'description',
+  categoryId: 'categoryId',
+  orderId: 'orderId',
+  userId: 'userId',
+  createdById: 'createdById',
+  createdAt: 'createdAt'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  amount: 'amount',
+  method: 'method',
+  paidAt: 'paidAt',
+  note: 'note'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const DailyStatScalarFieldEnum = {
+  id: 'id',
+  date: 'date',
+  ordersCount: 'ordersCount',
+  revenue: 'revenue',
+  expenses: 'expenses',
+  profit: 'profit',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailyStatScalarFieldEnum = (typeof DailyStatScalarFieldEnum)[keyof typeof DailyStatScalarFieldEnum]
+
+
+export const MonthlyStatScalarFieldEnum = {
+  id: 'id',
+  year: 'year',
+  month: 'month',
+  ordersCount: 'ordersCount',
+  revenue: 'revenue',
+  expenses: 'expenses',
+  profit: 'profit',
+  workerPayroll: 'workerPayroll',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyStatScalarFieldEnum = (typeof MonthlyStatScalarFieldEnum)[keyof typeof MonthlyStatScalarFieldEnum]
+
+
+export const WorkerMonthlyStatScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  year: 'year',
+  month: 'month',
+  ordersCount: 'ordersCount',
+  hoursWorked: 'hoursWorked',
+  totalPay: 'totalPay',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WorkerMonthlyStatScalarFieldEnum = (typeof WorkerMonthlyStatScalarFieldEnum)[keyof typeof WorkerMonthlyStatScalarFieldEnum]
 
 
 export const SortOrder = {
