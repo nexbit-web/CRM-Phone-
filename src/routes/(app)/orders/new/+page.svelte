@@ -66,6 +66,7 @@
   let cleaners = $state<Cleaner[]>([])
   let cleanerId = $state('')
   let address = $state('') // пряме введення якщо немає збережених
+  let city = $state('')
   let scheduledDate = $state<DateValue | undefined>(today(getLocalTimeZone()))
   let calendarOpen = $state(false)
   let scheduledTime = $state('09:00')
@@ -106,6 +107,7 @@
     const parts = [p.street]
     if (p.apt) parts.push(`кв. ${p.apt}`)
     if (p.floor) parts.push(`${p.floor} пов.`)
+    if (p.city) parts.push(p.city)
     return parts.join(', ')
   }
 
@@ -132,7 +134,9 @@
 
   // Адреса для підсумку і відправки
   const effectiveAddress = $derived(
-    selectedProperty ? formatPropertyLabel(selectedProperty) : address,
+    selectedProperty
+      ? formatPropertyLabel(selectedProperty)
+      : [address, city].filter(Boolean).join(', '),
   )
 
   // ─── Валідація ──────────────────────────────────────────
@@ -212,6 +216,7 @@
     customerProperties = []
     selectedPropertyId = ''
     address = ''
+    city = ''
   }
 
   // ─── Завантаження даних ─────────────────────────────────
@@ -264,7 +269,7 @@
           // Передаємо або готовий propertyId або нову адресу
           ...(selectedPropertyId
             ? { propertyId: selectedPropertyId }
-            : { street: address.trim() }),
+            : { street: address.trim(), city: city.trim() }),
           scheduledDate: baseDate.toISOString(),
           cleaningType,
           notes: notes.trim(),
@@ -590,17 +595,25 @@
 
           <!-- Поле нової адреси — тільки якщо вибрали "нова" -->
           {#if selectedPropertyId === ''}
-            <div class="relative">
-              <MapPin
-                class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
-              />
+            <div class="space-y-2">
+              <div class="relative">
+                <MapPin
+                  class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+                />
+                <Input
+                  bind:value={address}
+                  placeholder="вул. Хрещатик, 22, кв. 45"
+                  class="h-9 pl-9 text-sm {errors.address
+                    ? 'border-destructive focus-visible:ring-destructive'
+                    : ''}"
+                  oninput={() => (errors = { ...errors, address: '' })}
+                />
+              </div>
               <Input
-                bind:value={address}
-                placeholder="вул. Хрещатик, 22, кв. 45"
-                class="h-9 pl-9 text-sm {errors.address
-                  ? 'border-destructive focus-visible:ring-destructive'
-                  : ''}"
-                oninput={() => (errors = { ...errors, address: '' })}
+                bind:value={city}
+                placeholder="Місто (напр. Київ)"
+                disabled={!selectedCustomer}
+                class="h-9 text-sm mt-2"
               />
             </div>
           {/if}
@@ -622,6 +635,12 @@
               oninput={() => (errors = { ...errors, address: '' })}
             />
           </div>
+          <Input
+            bind:value={city}
+            placeholder="Місто (напр. Київ)"
+            disabled={!selectedCustomer}
+            class="h-9 text-sm mt-2"
+          />
           {#if selectedCustomer && customerProperties.length === 0}
             <p class="text-xs text-muted-foreground">
               У клієнта немає збережених адрес
@@ -839,7 +858,7 @@
           bind:value={notes}
           placeholder="Особливі побажання, код домофону, є собака..."
           rows={3}
-          class="resize-none border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+          class="resize-none border-0 bg-transparent px-2 text-sm shadow-none focus-visible:ring-0"
         />
       </div>
     </div>

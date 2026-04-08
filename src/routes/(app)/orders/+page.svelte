@@ -39,7 +39,7 @@
     status: OrderStatus
     totalAmount: unknown // ✅ було: string | number — Prisma повертає Decimal
     customer: { name: string; phone: string }
-    property: { address: string; city: string }
+    property: { address?: string; street?: string; city: string }
     cleaner?: { name: string }
     items: Array<{ service: { name: string }; qty: number }>
   }
@@ -136,7 +136,9 @@
       const q = search.toLowerCase()
       const matchesSearch =
         order.customer.name.toLowerCase().includes(q) ||
-        order.property.address.toLowerCase().includes(q) ||
+        (order.property.street ?? order.property.address ?? '')
+          .toLowerCase()
+          .includes(q) ||
         order.customer.phone.includes(q)
       const matchesStatus =
         statusFilter === 'ALL' || order.status === statusFilter
@@ -169,7 +171,7 @@
 
 <div class="mx-auto max-w-screen-2xl px-1 py-8 sm:px-6 lg:px-8 space-y-6">
   {#if loading}
-    <div class="absolute  inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 z-50 flex items-center justify-center">
       <div class="flex flex-col items-center gap-3">
         <Spinner class="h-8 w-8" />
         <p class="text-sm font-medium text-muted-foreground">
@@ -354,12 +356,16 @@
                 </div>
               </Table.Cell>
 
-              <Table.Cell class=" ">
-                <div class="flex items-start gap-1.5">
+              <Table.Cell>
+                <div class="flex items-start gap-1.5 text-sm truncate">
                   <MapPin
-                    class="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0"
+                    size={20}
                   />
-                  <span class="text-sm truncate">{order.property.address}</span>
+                  <span  
+                    >{order.property.street ??
+                      order.property.address ??
+                      '—'}</span
+                  >
                 </div>
               </Table.Cell>
 
@@ -454,7 +460,9 @@
             </div>
             <div class="flex items-center gap-1.5 text-muted-foreground">
               <MapPin class="h-3.5 w-3.5 shrink-0" />
-              <span class="truncate">{order.property.address}</span>
+              <span class="truncate"
+                >{order.property.street ?? order.property.address ?? '—'}</span
+              >
             </div>
             {#if order.cleaner?.name}
               <div class="flex items-center gap-1.5 text-muted-foreground">

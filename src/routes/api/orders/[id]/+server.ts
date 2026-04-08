@@ -14,13 +14,14 @@ const UpdateOrderSchema = z.object({
   totalAmount: z.number().nonnegative().max(1_000_000).optional(),
   notes: z.string().max(1000).trim().optional(),
   customerName: z.string().min(2).max(100).trim().optional(),
+  street: z.string().min(5).max(300).trim().optional(),
+  city: z.string().max(100).trim().optional(),
   customerPhone: z
     .string()
     .min(7, 'Телефон занадто короткий')
     .max(25)
     .trim()
     .optional(),
-  address: z.string().min(5).max(300).trim().optional(),
 })
 
 export const GET: RequestHandler = async ({ params, request }) => {
@@ -84,7 +85,8 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
     notes,
     customerName,
     customerPhone,
-    address,
+    street,
+    city,
   } = parsed.data
 
   try {
@@ -106,10 +108,13 @@ export const PATCH: RequestHandler = async ({ params, request }) => {
         })
       }
 
-      if (address) {
+      if (street || city) {
         await tx.property.update({
           where: { id: existingOrder.propertyId },
-          data: { address },
+          data: {
+            ...(street && { street }),
+            ...(city !== undefined && { city }),
+          },
         })
       }
 

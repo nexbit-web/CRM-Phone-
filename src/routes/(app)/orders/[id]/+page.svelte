@@ -44,7 +44,8 @@
 
   let editCustomerName = $state(order.customer.name)
   let editCustomerPhone = $state(order.customer.phone)
-  let editAddress = $state(order.property.address)
+  let editAddress = $state(order.property.street ?? '')
+  let editCity = $state(order.property.city ?? '')
   let editScheduledDate = $state(
     format(new Date(order.scheduledDate), "yyyy-MM-dd'T'HH:mm"),
   )
@@ -191,6 +192,7 @@
       customerName: editCustomerName,
       customerPhone: editCustomerPhone,
       address: editAddress,
+      city: editCity,
       scheduledDate: new Date(editScheduledDate).toISOString(),
       totalAmount: editTotalAmount,
       notes: editNotes,
@@ -204,7 +206,8 @@
   function cancelEdit() {
     editCustomerName = order.customer.name
     editCustomerPhone = order.customer.phone
-    editAddress = order.property.address
+    editAddress = order.property.street ?? ''
+    editCity = order.property.city ?? ''
     editScheduledDate = format(
       new Date(order.scheduledDate),
       "yyyy-MM-dd'T'HH:mm",
@@ -239,6 +242,16 @@
   const currentPaymentCfg = $derived(
     paymentConfig[order.paymentStatus as PaymentStatus] ?? paymentConfig.UNPAID,
   )
+
+  function formatAddress(property: {
+    street: string
+    apt?: string | null
+    city?: string
+  }): string {
+    return [property.street, property.apt, property.city]
+      .filter(Boolean)
+      .join(', ')
+  }
 </script>
 
 <div class="min-h-screen">
@@ -333,7 +346,7 @@
             {/if}
           </div>
           <h1 class="text-xl font-semibold text-foreground">
-            {order.customer.name} — {order.property.address}
+            {order.customer.name} — {formatAddress(order.property)}
           </h1>
         </div>
 
@@ -395,8 +408,17 @@
           </div>
 
           {#if editMode}
-            <div class="rounded-lg border bg-card p-4">
-              <Input bind:value={editAddress} class="h-9 text-sm" />
+            <div class="rounded-lg border bg-card p-4 flex flex-col gap-3">
+              <Input
+                bind:value={editAddress}
+                placeholder="Вулиця та будинок"
+                class="h-9 text-sm"
+              />
+              <Input
+                bind:value={editCity}
+                placeholder="Місто"
+                class="h-9 text-sm"
+              />
             </div>
           {:else}
             <div
@@ -409,7 +431,9 @@
                   <Building2 class="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div>
-                  <p class="text-sm font-medium">{order.property.address}</p>
+                  <p class="text-sm font-medium">
+                    {formatAddress(order.property)}
+                  </p>
                   <p class="text-xs text-muted-foreground mt-0.5">
                     {order.property.city}
                   </p>

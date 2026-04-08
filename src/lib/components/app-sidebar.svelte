@@ -12,6 +12,7 @@
     Settings,
     ShieldUser,
     UserPlus,
+    CirclePlus,
   } from '@lucide/svelte'
 
   type NavItem = {
@@ -27,6 +28,7 @@
     { title: 'Клієнти', url: '/clients', icon: Contact },
     { title: 'Додати клієнта', url: '/clients/new', icon: UserPlus },
     { title: 'Персонал', url: '/staff', icon: Users },
+    { title: 'Додати клінера', url: '/staff/new', icon: CirclePlus },
     { title: 'Фінанси', url: '/finance', icon: Wallet },
     { title: 'Послуги та ціни', url: '/services', icon: Sparkles },
     { title: 'Адмін', url: '/admin', icon: ShieldUser },

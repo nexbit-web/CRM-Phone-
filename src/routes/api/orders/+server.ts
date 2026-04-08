@@ -38,6 +38,7 @@ const CreateOrderSchema = z.object({
   // Підтримуємо обидва варіанти: address (стара) і street (нова схема)
   address: z.string().min(3).max(300).trim().optional(),
   street: z.string().min(3).max(300).trim().optional(),
+  city: z.string().max(100).trim().optional().default(''),
   propertyId: z.string().optional(), // якщо передаємо готовий ID
   scheduledDate: z.string(),
   notes: z.string().max(1000).trim().optional().default(''),
@@ -73,6 +74,7 @@ export const POST: RequestHandler = async ({ request }) => {
       customerPhone,
       address,
       street,
+      city,
       propertyId,
       scheduledDate,
       notes,
@@ -121,7 +123,7 @@ export const POST: RequestHandler = async ({ request }) => {
             data: {
               customerId: customer.id,
               street: streetValue,
-              city: 'Київ',
+              city: city,
             },
           })
         }
