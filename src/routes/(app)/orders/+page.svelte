@@ -297,8 +297,6 @@
             >
             <Table.Head class="font-semibold text-foreground">Клієнт</Table.Head
             >
-            <Table.Head class="font-semibold text-foreground">Адреса</Table.Head
-            >
             <Table.Head class="font-semibold text-foreground"
               >Послуги</Table.Head
             >
@@ -353,19 +351,6 @@
                       {order.customer.phone}
                     </p>
                   </div>
-                </div>
-              </Table.Cell>
-
-              <Table.Cell>
-                <div class="flex items-start gap-1.5 text-sm truncate">
-                  <MapPin
-                    size={20}
-                  />
-                  <span  
-                    >{order.property.street ??
-                      order.property.address ??
-                      '—'}</span
-                  >
                 </div>
               </Table.Cell>
 
