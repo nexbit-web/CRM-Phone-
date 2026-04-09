@@ -30,7 +30,11 @@
   import { page } from '$app/stores'
   import toast from 'svelte-hot-french-toast'
   import { onMount, tick } from 'svelte'
-  import { getLocalTimeZone, today } from '@internationalized/date'
+  import {
+    getLocalTimeZone,
+    today,
+    CalendarDate,
+  } from '@internationalized/date'
   import type { DateValue } from '@internationalized/date'
 
   // ─── Типи ───────────────────────────────────────────────
@@ -67,7 +71,16 @@
   let cleanerId = $state('')
   let address = $state('') // пряме введення якщо немає збережених
   let city = $state('')
-  let scheduledDate = $state<DateValue | undefined>(today(getLocalTimeZone()))
+
+  function parseDateParam(): DateValue {
+    const raw = $page.url.searchParams.get('date')
+    if (raw) {
+      const [y, m, d] = raw.split('-').map(Number)
+      if (y && m && d) return new CalendarDate(y, m, d)
+    }
+    return today(getLocalTimeZone())
+  }
+  let scheduledDate = $state<DateValue | undefined>(parseDateParam())
   let calendarOpen = $state(false)
   let scheduledTime = $state('09:00')
   let cleaningType = $state('REGULAR')
