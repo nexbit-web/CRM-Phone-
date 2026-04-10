@@ -11,6 +11,19 @@
   }
 
   let { items }: { items: NavItem[] } = $props()
+
+  // Основна функція перевірки активної вкладки
+  function isActive(url: string): boolean {
+    const pathname = $page.url.pathname
+
+    if (url === '/orders') {
+      return (
+        pathname === '/orders' ||
+        (pathname.startsWith('/orders/') && !pathname.startsWith('/orders/new'))
+      )
+    }
+    return pathname === url
+  }
 </script>
 
 <Sidebar.Group>
@@ -18,7 +31,7 @@
     <Sidebar.Menu>
       {#each items as item (item.title)}
         <Sidebar.MenuItem>
-          <Sidebar.MenuButton isActive={$page.url.pathname === item.url}>
+          <Sidebar.MenuButton isActive={isActive(item.url)}>
             {#snippet child({ props })}
               <a href={item.url} {...props}>
                 <item.icon />
