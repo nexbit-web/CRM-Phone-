@@ -17,6 +17,7 @@ export const GET: RequestHandler = async ({ request }) => {
         customer: true,
         property: true,
         cleaner: { select: { id: true, name: true, image: true } },
+        workers: { select: { user: { select: { id: true, name: true } } } },
         items: { include: { service: true } },
       },
       orderBy: { scheduledDate: 'desc' },
@@ -35,15 +36,15 @@ export const GET: RequestHandler = async ({ request }) => {
 const CreateOrderSchema = z.object({
   customerName: z.string().min(2).max(100).trim(),
   customerPhone: z.string().min(7).max(25).trim(),
-  // Підтримуємо обидва варіанти: address (стара) і street (нова схема)
   address: z.string().min(3).max(300).trim().optional(),
   street: z.string().min(3).max(300).trim().optional(),
   city: z.string().max(100).trim().optional().default(''),
-  propertyId: z.string().optional(), // якщо передаємо готовий ID
+  propertyId: z.string().optional(),
   scheduledDate: z.string(),
   notes: z.string().max(1000).trim().optional().default(''),
   totalAmount: z.number().nonnegative().max(1_000_000).optional().default(0),
   cleanerId: z.string().optional(),
+  cleanerIds: z.array(z.string()).optional().default([]),
   cleaningType: z.string().optional(),
 })
 
@@ -80,9 +81,10 @@ export const POST: RequestHandler = async ({ request }) => {
       notes,
       totalAmount,
       cleanerId,
+      cleanerIds,
+      cleaningType,
     } = parsed.data
 
-    // street або address — береємо що прийшло
     const streetValue = (street ?? address ?? '').trim()
 
     if (!streetValue && !propertyId) {
@@ -106,11 +108,9 @@ export const POST: RequestHandler = async ({ request }) => {
       // 2. Об'єкт нерухомості
       let property
       if (propertyId) {
-        // Якщо передали готовий ID — використовуємо його
         property = await tx.property.findUnique({ where: { id: propertyId } })
         if (!property) throw new Error("Об'єкт не знайдено")
       } else {
-        // ✅ Шукаємо по street (нова схема)
         property = await tx.property.findFirst({
           where: {
             customerId: customer.id,
@@ -118,7 +118,6 @@ export const POST: RequestHandler = async ({ request }) => {
           },
         })
         if (!property) {
-          // ✅ Створюємо з полем street (нова схема)
           property = await tx.property.create({
             data: {
               customerId: customer.id,
@@ -129,7 +128,8 @@ export const POST: RequestHandler = async ({ request }) => {
         }
       }
 
-      return tx.order.create({
+      // 3. Замовлення
+      const order = await tx.order.create({
         data: {
           scheduledDate: new Date(scheduledDate),
           status: 'PENDING',
@@ -143,6 +143,45 @@ export const POST: RequestHandler = async ({ request }) => {
         },
         include: { customer: true, property: true },
       })
+
+      // 4. Workers
+      const workerIds =
+        cleanerIds.length > 0 ? cleanerIds : cleanerId ? [cleanerId] : []
+
+      if (workerIds.length > 0) {
+        await tx.orderWorker.createMany({
+          data: workerIds.map((userId) => ({
+            orderId: order.id,
+            userId,
+          })),
+          skipDuplicates: true,
+        })
+      }
+
+      // 5. OrderItem — знаходимо сервіс по типу і створюємо позицію
+      if (cleaningType) {
+        const service = await tx.cleaningService.findFirst({
+          where: {
+            type: cleaningType as any,
+            isActive: true,
+          },
+        })
+
+        if (service) {
+          await tx.orderItem.create({
+            data: {
+              orderId: order.id,
+              serviceId: service.id,
+              qty: 1,
+              price: service.basePrice,
+            },
+          })
+        } else {
+          console.warn(`CleaningService з типом "${cleaningType}" не знайдено в БД`)
+        }
+      }
+
+      return order
     })
 
     return json({

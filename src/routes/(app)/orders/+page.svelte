@@ -41,6 +41,7 @@
     customer: { name: string; phone: string }
     property: { address?: string; street?: string; city: string }
     cleaner?: { name: string }
+    workers?: Array<{ user: { name: string } }>
     items: Array<{ service: { name: string }; qty: number }>
   }
 
@@ -373,19 +374,43 @@
               </Table.Cell>
 
               <Table.Cell>
-                {#if order.cleaner?.name}
-                  <div class="flex items-center gap-1.5">
-                    <div
-                      class="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium shrink-0"
-                    >
-                      {getInitials(order.cleaner.name)}
+                {@const allCleaners = [
+                  ...(order.workers?.map((w) => w.user) ?? []),
+                  ...(order.cleaner && !order.workers?.length
+                    ? [order.cleaner]
+                    : []),
+                ]}
+                {#if allCleaners.length > 0}
+                  <div class="flex items-center gap-2">
+                    <div class="flex -space-x-2">
+                      {#each allCleaners.slice(0, 3) as c}
+                        <div
+                          title={c.name}
+                          class="h-6 w-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-semibold ring-1 ring-border shrink-0"
+                        >
+                          {getInitials(c.name)}
+                        </div>
+                      {/each}
+                      {#if allCleaners.length > 3}
+                        <div
+                          class="h-6 w-6 rounded-full bg-muted border-2 border-background flex items-center justify-center text-[10px] font-semibold text-muted-foreground ring-1 ring-border shrink-0"
+                        >
+                          +{allCleaners.length - 3}
+                        </div>
+                      {/if}
                     </div>
-                    <span class="text-sm">{order.cleaner.name}</span>
+                    {#if allCleaners.length === 1}
+                      <span class="text-sm truncate max-w-[90px]"
+                        >{allCleaners[0].name.split(' ')[0]}</span
+                      >
+                    {:else}
+                      <span class="text-xs text-muted-foreground"
+                        >{allCleaners.length} клінери</span
+                      >
+                    {/if}
                   </div>
                 {:else}
-                  <span class="text-xs text-muted-foreground italic"
-                    >Не призначено</span
-                  >
+                  <span class="text-xs text-muted-foreground/50 italic">Клінера не додано</span>
                 {/if}
               </Table.Cell>
 

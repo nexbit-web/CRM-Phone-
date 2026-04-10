@@ -5,6 +5,7 @@
   import { Label } from '$lib/components/ui/label'
   import Calendar from '$lib/components/ui/calendar/calendar.svelte'
   import * as Popover from '$lib/components/ui/popover/index.js'
+
   import {
     ArrowLeft,
     Save,
@@ -26,6 +27,7 @@
     Clock,
     Building2,
   } from 'lucide-svelte'
+
   import { goto } from '$app/navigation'
   import { page } from '$app/stores'
   import toast from 'svelte-hot-french-toast'
@@ -54,7 +56,7 @@
     area?: number | null
   }
 
-  // ─── Стан ───────────────────────────────────────────────
+  // ─── Стан — клієнт ──────────────────────────────────────
   let selectedCustomer = $state<Customer | null>(null)
   let customerSearch = $state('')
   let customers = $state<Customer[]>([])
@@ -62,25 +64,56 @@
   let searchOpen = $state(false)
   let searchTimeout: ReturnType<typeof setTimeout>
 
-  // Об'єкти нерухомості клієнта
+  // ─── Стан — об'єкти ─────────────────────────────────────
   let customerProperties = $state<Property[]>([])
-  let selectedPropertyId = $state<string>('') // '' = нова адреса
+  let selectedPropertyId = $state<string>('')
   let propertiesLoading = $state(false)
 
+  // ─── Стан — клінери (мультивибір) ───────────────────────
   let cleaners = $state<Cleaner[]>([])
-  let cleanerId = $state('')
-  let address = $state('') // пряме введення якщо немає збережених
+  let selectedCleanerIds = $state<Set<string>>(new Set())
+  let cleanerSearch = $state('')
+
+  // Фільтрований список клінерів
+  const filteredCleaners = $derived(
+    cleanerSearch.trim()
+      ? cleaners.filter((c) =>
+          c.name.toLowerCase().includes(cleanerSearch.toLowerCase()),
+        )
+      : cleaners,
+  )
+
+  // Підписи вибраних клінерів
+  const selectedCleanerNames = $derived(
+    cleaners
+      .filter((c) => selectedCleanerIds.has(c.id))
+      .map((c) => c.name.split(' ')[0])
+      .join(', '),
+  )
+
+  function toggleCleaner(id: string) {
+    const next = new Set(selectedCleanerIds)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    selectedCleanerIds = next
+  }
+
+  // ─── Стан — форма ───────────────────────────────────────
+  let address = $state('')
   let city = $state('')
 
-  function parseDateParam(): DateValue {
-    const raw = $page.url.searchParams.get('date')
-    if (raw) {
-      const [y, m, d] = raw.split('-').map(Number)
-      if (y && m && d) return new CalendarDate(y, m, d)
-    }
-    return today(getLocalTimeZone())
-  }
-  let scheduledDate = $state<DateValue | undefined>(parseDateParam())
+  // Виправлений scheduledDate (саме тут була помилка)
+  let scheduledDate = $state<DateValue | undefined>(
+    (() => {
+      const raw = $page.url.searchParams.get('date')
+      if (raw) {
+        const [y, m, d] = raw.split('-').map(Number)
+        if (y && m && d) return new CalendarDate(y, m, d)
+      }
+      return today(getLocalTimeZone())
+    })(),
+  )
+
   let calendarOpen = $state(false)
   let scheduledTime = $state('09:00')
   let cleaningType = $state('REGULAR')
@@ -104,10 +137,12 @@
     'лис',
     'гру',
   ]
+
   function formatDate(val: DateValue | undefined) {
     if (!val) return 'Оберіть дату'
     return `${val.day} ${MONTHS[val.month - 1]} ${val.year}`
   }
+
   function getInitials(name: string) {
     return name
       .split(' ')
@@ -116,6 +151,7 @@
       .join('')
       .toUpperCase()
   }
+
   function formatPropertyLabel(p: Property) {
     const parts = [p.street]
     if (p.apt) parts.push(`кв. ${p.apt}`)
@@ -135,17 +171,14 @@
     { value: 'OTHER', label: 'Інше' },
   ]
 
-  const selectedCleanerName = $derived(
-    cleaners.find((c) => c.id === cleanerId)?.name ?? '',
-  )
   const selectedTypeName = $derived(
     cleaningTypes.find((t) => t.value === cleaningType)?.label ?? '',
   )
+
   const selectedProperty = $derived(
     customerProperties.find((p) => p.id === selectedPropertyId),
   )
 
-  // Адреса для підсумку і відправки
   const effectiveAddress = $derived(
     selectedProperty
       ? formatPropertyLabel(selectedProperty)
@@ -155,12 +188,16 @@
   // ─── Валідація ──────────────────────────────────────────
   function validate() {
     const e: Record<string, string> = {}
+
     if (!selectedCustomer) e.customer = 'Оберіть клієнта'
-    if (!selectedPropertyId && (!address.trim() || address.trim().length < 5))
+    if (!selectedPropertyId && (!address.trim() || address.trim().length < 5)) {
       e.address = 'Мін. 5 символів'
+    }
     if (!scheduledDate) e.date = 'Оберіть дату'
-    if (totalAmount !== '' && Number(totalAmount) < 0)
+    if (totalAmount !== '' && Number(totalAmount) < 0) {
       e.totalAmount = "Від'ємна сума"
+    }
+
     errors = e
     return Object.keys(e).length === 0
   }
@@ -174,11 +211,13 @@
     selectedPropertyId = ''
     address = ''
     clearTimeout(searchTimeout)
+
     if (!val.trim()) {
       customers = []
       searchOpen = false
       return
     }
+
     searchTimeout = setTimeout(async () => {
       searchLoading = true
       searchOpen = true
@@ -194,7 +233,6 @@
     }, 250)
   }
 
-  // ─── Вибір клієнта → завантаження об'єктів ──────────────
   async function selectCustomer(c: Customer) {
     selectedCustomer = c
     customerSearch = ''
@@ -202,19 +240,17 @@
     customers = []
     errors = { ...errors, customer: '' }
 
-    // Завантажуємо об'єкти клієнта
     propertiesLoading = true
     selectedPropertyId = ''
     address = ''
+
     try {
       const res = await fetch(`/api/customers/${c.id}/properties`)
       const data = await res.json()
       if (data.success) {
         customerProperties = data.properties
-        // Автоматично вибираємо першу адресу якщо вона одна
-        if (data.properties.length === 1) {
+        if (data.properties.length === 1)
           selectedPropertyId = data.properties[0].id
-        }
       }
     } finally {
       propertiesLoading = false
@@ -232,7 +268,7 @@
     city = ''
   }
 
-  // ─── Завантаження даних ─────────────────────────────────
+  // ─── Завантаження ───────────────────────────────────────
   onMount(async () => {
     const res = await fetch('/api/cleaners')
     const data = await res.json()
@@ -245,9 +281,9 @@
       try {
         const r = await fetch(`/api/customers?q=${encodeURIComponent(autoQ)}`)
         const d = await r.json()
-        if (d.success && d.customers.length === 1)
+        if (d.success && d.customers.length === 1) {
           await selectCustomer(d.customers[0])
-        else if (d.success && d.customers.length > 1) {
+        } else if (d.success && d.customers.length > 1) {
           customers = d.customers
           searchOpen = true
         }
@@ -266,6 +302,7 @@
         ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
+
     loading = true
     const tz = getLocalTimeZone()
     const baseDate = scheduledDate!.toDate(tz)
@@ -279,7 +316,6 @@
         body: JSON.stringify({
           customerName: selectedCustomer!.name,
           customerPhone: selectedCustomer!.phone,
-          // Передаємо або готовий propertyId або нову адресу
           ...(selectedPropertyId
             ? { propertyId: selectedPropertyId }
             : { street: address.trim(), city: city.trim() }),
@@ -287,14 +323,21 @@
           cleaningType,
           notes: notes.trim(),
           totalAmount: totalAmount === '' ? 0 : Number(totalAmount),
-          cleanerId: cleanerId || undefined,
+          cleanerIds: Array.from(selectedCleanerIds),
+          cleanerId:
+            selectedCleanerIds.size > 0
+              ? Array.from(selectedCleanerIds)[0]
+              : undefined,
         }),
       })
+
       const data = await res.json()
       if (data.success) {
         toast.success('Замовлення створено!')
         goto('/orders')
-      } else toast.error(data.error || 'Не вдалося створити замовлення')
+      } else {
+        toast.error(data.error || 'Не вдалося створити замовлення')
+      }
     } catch {
       toast.error('Помилка підключення')
     } finally {
@@ -532,7 +575,6 @@
       </div>
       <div class="p-4 space-y-3">
         {#if propertiesLoading}
-          <!-- Завантаження об'єктів -->
           <div
             class="flex items-center gap-2 py-2 text-xs text-muted-foreground"
           >
@@ -542,7 +584,6 @@
             Завантаження адрес клієнта...
           </div>
         {:else if customerProperties.length > 0}
-          <!-- Збережені адреси клієнта -->
           <div class="space-y-1.5">
             <p class="text-xs text-muted-foreground mb-2">
               Оберіть збережену адресу або введіть нову:
@@ -582,8 +623,6 @@
                 {/if}
               </button>
             {/each}
-
-            <!-- Нова адреса -->
             <button
               onclick={() => {
                 selectedPropertyId = ''
@@ -605,8 +644,6 @@
               {/if}
             </button>
           </div>
-
-          <!-- Поле нової адреси — тільки якщо вибрали "нова" -->
           {#if selectedPropertyId === ''}
             <div class="space-y-2">
               <div class="relative">
@@ -625,13 +662,11 @@
               <Input
                 bind:value={city}
                 placeholder="Місто (напр. Київ)"
-                disabled={!selectedCustomer}
-                class="h-9 text-sm mt-2"
+                class="h-9 text-sm"
               />
             </div>
           {/if}
         {:else}
-          <!-- Немає збережених адрес або клієнт не вибраний -->
           <div class="relative">
             <MapPin
               class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
@@ -750,8 +785,8 @@
             {#each cleaningTypes as type}
               <button
                 onclick={() => (cleaningType = type.value)}
-                class="cursor-pointer rounded-md border px-3 py-2 text-xs font-medium text-left transition-all
-                  {cleaningType === type.value
+                class="cursor-pointer rounded-md border px-3 py-2 text-xs font-medium text-left transition-all {cleaningType ===
+                type.value
                   ? 'border-primary/40 bg-primary/5 text-primary'
                   : 'border-input hover:border-muted-foreground/40 hover:bg-muted/30 text-muted-foreground'}"
               >
@@ -790,7 +825,7 @@
       </div>
     </div>
 
-    <!-- ════ КЛІНЕР ════════════════════════════════════════ -->
+    <!-- ════ КЛІНЕРИ (мультивибір) ══════════════════════════ -->
     <div class="rounded-xl border bg-card overflow-hidden shadow-sm">
       <div
         class="flex items-center justify-between px-4 py-3 border-b bg-muted/30"
@@ -799,55 +834,120 @@
           <UserCheck class="h-3.5 w-3.5 text-muted-foreground" />
           <span
             class="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-            >Клінер</span
+            >Клінери</span
           >
+          <!-- Лічильник вибраних -->
+          {#if selectedCleanerIds.size > 0}
+            <span
+              class="inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold"
+            >
+              {selectedCleanerIds.size}
+            </span>
+          {/if}
         </div>
-        <span class="text-xs text-muted-foreground/50">необов'язково</span>
+        <div class="flex items-center gap-2">
+          <!-- Кнопка скинути -->
+          {#if selectedCleanerIds.size > 0}
+            <button
+              onclick={() => (selectedCleanerIds = new Set())}
+              class="cursor-pointer text-[10px] text-muted-foreground hover:text-destructive transition-colors flex items-center gap-0.5"
+            >
+              <X class="h-3 w-3" />Скинути
+            </button>
+          {/if}
+          <span class="text-xs text-muted-foreground/50">необов'язково</span>
+        </div>
       </div>
-      <div class="p-4">
+
+      <div class="p-4 space-y-3">
         {#if cleaners.length === 0}
           <p class="text-xs text-muted-foreground italic">
             Немає доступних клінерів — призначте пізніше
           </p>
         {:else}
-          <div class="grid grid-cols-1 gap-1.5">
-            <button
-              onclick={() => (cleanerId = '')}
-              class="cursor-pointer flex items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all text-left
-                {cleanerId === ''
-                ? 'border-muted-foreground/30 bg-muted/40'
-                : 'border-transparent text-muted-foreground hover:bg-muted/20'}"
-            >
-              <div
-                class="h-7 w-7 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shrink-0"
-              >
-                <X class="h-3 w-3 text-muted-foreground/40" />
-              </div>
-              <span class="text-xs">Без клінера</span>
-              {#if cleanerId === ''}<Check
-                  class="h-3.5 w-3.5 ml-auto text-muted-foreground"
-                />{/if}
-            </button>
-            {#each cleaners as cl}
+          <!-- Пошук по клінерах -->
+          <div class="relative">
+            <Search
+              class="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground"
+            />
+            <input
+              bind:value={cleanerSearch}
+              placeholder="Пошук клінера..."
+              class="flex h-8 w-full rounded-md border border-input bg-muted/30 py-1 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors"
+            />
+            {#if cleanerSearch}
               <button
-                onclick={() => (cleanerId = cl.id)}
-                class="cursor-pointer flex items-center gap-3 rounded-md border px-3 py-2 text-sm transition-all text-left
-                  {cleanerId === cl.id
-                  ? 'border-primary/30 bg-primary/5'
-                  : 'border-transparent text-muted-foreground hover:bg-muted/20'}"
+                onclick={() => (cleanerSearch = '')}
+                class="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <div
-                  class="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0"
-                >
-                  {getInitials(cl.name)}
-                </div>
-                <span class="text-sm font-medium">{cl.name}</span>
-                {#if cleanerId === cl.id}<Check
-                    class="h-3.5 w-3.5 ml-auto text-primary"
-                  />{/if}
+                <X class="h-3.5 w-3.5" />
               </button>
-            {/each}
+            {/if}
           </div>
+
+          <!-- Список з обмеженою висотою та скролом -->
+          <div
+            class="max-h-48 overflow-y-auto space-y-1 overscroll-contain pr-0.5"
+          >
+            {#if filteredCleaners.length === 0}
+              <p class="text-xs text-muted-foreground text-center py-3">
+                Нічого не знайдено
+              </p>
+            {:else}
+              {#each filteredCleaners as cl}
+                {@const isSelected = selectedCleanerIds.has(cl.id)}
+                <button
+                  onclick={() => toggleCleaner(cl.id)}
+                  class="cursor-pointer w-full flex items-center gap-3 rounded-lg border px-3 py-2 text-left transition-all
+                    {isSelected
+                    ? 'border-primary/30 bg-primary/5'
+                    : 'border-transparent hover:border-input hover:bg-muted/20'}"
+                >
+                  <!-- Чекбокс -->
+                  <div
+                    class="h-4 w-4 rounded border-2 shrink-0 flex items-center justify-center transition-all
+                    {isSelected
+                      ? 'bg-primary border-primary'
+                      : 'border-muted-foreground/40'}"
+                  >
+                    {#if isSelected}
+                      <Check class="h-2.5 w-2.5 text-primary-foreground" />
+                    {/if}
+                  </div>
+
+                  <!-- Аватар -->
+                  <div
+                    class="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0"
+                  >
+                    {getInitials(cl.name)}
+                  </div>
+
+                  <!-- Ім'я -->
+                  <span class="text-sm font-medium flex-1 text-left"
+                    >{cl.name}</span
+                  >
+
+                  <!-- Галочка справа якщо вибраний -->
+                  {#if isSelected}
+                    <span class="text-[10px] font-medium text-primary shrink-0"
+                      >✓</span
+                    >
+                  {/if}
+                </button>
+              {/each}
+            {/if}
+          </div>
+
+          <!-- Підсумок вибраних -->
+          {#if selectedCleanerIds.size > 0}
+            <div class="flex items-center gap-2 pt-1 border-t">
+              <p class="text-xs text-muted-foreground flex-1">
+                Вибрано: <span class="font-medium text-foreground"
+                  >{selectedCleanerNames}</span
+                >
+              </p>
+            </div>
+          {/if}
         {/if}
       </div>
     </div>
@@ -887,7 +987,7 @@
       </div>
       <div class="p-4">
         <dl class="space-y-2.5">
-          {#each [{ label: 'Клієнт', value: selectedCustomer?.name ?? '—' }, { label: 'Телефон', value: selectedCustomer?.phone ?? '—' }, { label: 'Адреса', value: effectiveAddress || '—' }, { label: 'Дата', value: `${formatDate(scheduledDate)}, ${scheduledTime}` }, { label: 'Тип', value: selectedTypeName || '—' }, { label: 'Клінер', value: selectedCleanerName || 'Не призначено' }, { label: 'Сума', value: `${totalAmount === '' ? '0' : Number(totalAmount).toLocaleString('uk-UA')} ₴` }] as row}
+          {#each [{ label: 'Клієнт', value: selectedCustomer?.name ?? '—' }, { label: 'Телефон', value: selectedCustomer?.phone ?? '—' }, { label: 'Адреса', value: effectiveAddress || '—' }, { label: 'Дата', value: `${formatDate(scheduledDate)}, ${scheduledTime}` }, { label: 'Тип', value: selectedTypeName || '—' }, { label: 'Клінери', value: selectedCleanerNames || 'Не призначено' }, { label: 'Сума', value: `${totalAmount === '' ? '0' : Number(totalAmount).toLocaleString('uk-UA')} ₴` }] as row}
             <div class="flex items-baseline justify-between gap-4">
               <dt class="text-xs text-muted-foreground shrink-0">
                 {row.label}
