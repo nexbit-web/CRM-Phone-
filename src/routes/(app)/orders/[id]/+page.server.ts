@@ -37,6 +37,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       items: order.items.map((item) => ({
         ...item,
         price: parseFloat(item.price.toString()),
+        service: {
+          ...item.service,
+          basePrice: parseFloat(item.service.basePrice.toString()),
+        },
       })),
     },
     cleaners,

@@ -529,7 +529,7 @@
                 bind:value={editNotes}
                 rows={3}
                 placeholder="Додаткова інформація..."
-                class="resize-none text-sm border-0 p-0 focus-visible:ring-0 bg-transparent"
+                class="resize-none text-sm border-0 p-2 focus-visible:ring-0 bg-transparent"
               />
             </div>
           {:else}
@@ -576,22 +576,10 @@
                       {/if}
                     </div>
                   </div>
-                  <span class="text-sm font-semibold tabular-nums"
-                    >{formatAmount(item.price)} ₴</span
-                  >
+                
                 </div>
               {/each}
-              <div
-                class="flex items-center justify-between px-4 py-3 bg-muted/30"
-              >
-                <span
-                  class="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-                  >Разом</span
-                >
-                <span class="text-sm font-bold"
-                  >{formatAmount(order.totalAmount)} ₴</span
-                >
-              </div>
+              
             </div>
           </section>
         {/if}

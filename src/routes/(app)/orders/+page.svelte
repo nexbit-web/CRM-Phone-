@@ -410,7 +410,9 @@
                     {/if}
                   </div>
                 {:else}
-                  <span class="text-xs text-muted-foreground/50 italic">Клінера не додано</span>
+                  <span class="text-xs text-muted-foreground/50 italic"
+                    >Клінера не додано</span
+                  >
                 {/if}
               </Table.Cell>
 
