@@ -8,11 +8,10 @@
     Contact,
     Users,
     Wallet,
-    Sparkles,
-    Settings,
     ShieldUser,
     UserPlus,
     CirclePlus,
+    ChartSpline,
   } from '@lucide/svelte'
 
   type NavItem = {
@@ -30,9 +29,8 @@
     { title: 'Персонал', url: '/staff', icon: Users },
     { title: 'Додати клінера', url: '/staff/new', icon: CirclePlus },
     { title: 'Фінанси', url: '/finance', icon: Wallet },
-    { title: 'Послуги та ціни', url: '/services', icon: Sparkles },
+    { title: 'Аналітика', url: '/analytics', icon: ChartSpline },
     { title: 'Адмін', url: '/admin', icon: ShieldUser },
-    { title: 'Налаштування', url: '/settings', icon: Settings },
   ]
 </script>
 
