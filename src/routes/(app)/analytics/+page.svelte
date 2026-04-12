@@ -18,6 +18,8 @@
     CheckCircle2,
     XCircle,
     BarChart3,
+    ArrowUpRight,
+    ArrowDownRight,
   } from 'lucide-svelte'
 
   type Summary = {
@@ -30,7 +32,6 @@
     profit: number
     avgOrderValue: number
   }
-
   type MonthlyPoint = {
     month: string
     revenue: number
@@ -38,9 +39,7 @@
     orders: number
     profit: number
   }
-
   type TopCustomer = { name: string; orders: number; revenue: number }
-
   type AnalyticsData = {
     period: {
       from: string
@@ -121,7 +120,6 @@
   function fmt(n: number): string {
     return n.toLocaleString('uk-UA', { minimumFractionDigits: 0 })
   }
-
   function fmtDate(iso: string): string {
     return new Date(iso).toLocaleDateString('uk-UA', {
       day: '2-digit',
@@ -129,10 +127,8 @@
       year: 'numeric',
     })
   }
-
   function monthLabel(key: string): string {
-    const m = parseInt(key.split('-')[1]) - 1
-    return MONTHS_SHORT[m]
+    return MONTHS_SHORT[parseInt(key.split('-')[1]) - 1]
   }
 
   const chartConfig = {
@@ -164,9 +160,7 @@
         month = 12
         year--
       } else month--
-    } else if (period === 'year') {
-      year--
-    }
+    } else if (period === 'year') year--
     load()
   }
   function nextPeriod() {
@@ -175,12 +169,11 @@
         month = 1
         year++
       } else month++
-    } else if (period === 'year') {
-      year++
-    }
+    } else if (period === 'year') year++
     load()
   }
 
+  // ─── KPI конфіг — без кольорових смуг, з іконками ───────
   const kpis = $derived.by(() => {
     if (!data) return []
     const s = data.summary
@@ -188,69 +181,74 @@
       {
         label: 'Дохід',
         value: fmt(s.totalRevenue) + ' ₴',
+        sub: 'Загальний дохід',
         icon: TrendingUp,
-        color: 'text-emerald-600',
-        bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-        accent: 'bg-emerald-400',
+        iconBg: 'bg-emerald-500/20',
+        iconColor: 'text-emerald-400',
+        valueColor: 'text-emerald-400',
       },
       {
         label: 'Витрати',
         value: fmt(s.totalExpenses) + ' ₴',
+        sub: 'Загальні витрати',
         icon: TrendingDown,
-        color: 'text-red-500',
-        bg: 'bg-red-50 dark:bg-red-950/30',
-        accent: 'bg-red-400',
+        iconBg: 'bg-red-500/20',
+        iconColor: 'text-red-400',
+        valueColor: 'text-red-400',
       },
       {
         label: 'Зарплати',
         value: fmt(s.totalPayroll) + ' ₴',
+        sub: 'Фонд оплати праці',
         icon: Users,
-        color: 'text-violet-600',
-        bg: 'bg-violet-50 dark:bg-violet-950/30',
-        accent: 'bg-violet-400',
+        iconBg: 'bg-violet-500/20',
+        iconColor: 'text-violet-400',
+        valueColor: 'text-foreground',
       },
       {
         label: 'Прибуток',
         value: fmt(s.profit) + ' ₴',
+        sub: 'Чистий прибуток',
         icon: Banknote,
-        color: s.profit >= 0 ? 'text-emerald-600' : 'text-red-500',
-        bg:
-          s.profit >= 0
-            ? 'bg-emerald-50 dark:bg-emerald-950/30'
-            : 'bg-red-50 dark:bg-red-950/30',
-        accent: s.profit >= 0 ? 'bg-emerald-400' : 'bg-red-400',
+        iconBg: s.profit >= 0 ? 'bg-emerald-500/20' : 'bg-red-500/20',
+        iconColor: s.profit >= 0 ? 'text-emerald-400' : 'text-red-400',
+        valueColor: s.profit >= 0 ? 'text-emerald-400' : 'text-red-400',
       },
       {
         label: 'Замовлень',
         value: String(s.totalOrders),
+        sub: 'За обраний період',
         icon: ShoppingBag,
-        color: 'text-sky-600',
-        bg: 'bg-sky-50 dark:bg-sky-950/30',
-        accent: 'bg-sky-400',
+        iconBg: 'bg-sky-500/20',
+        iconColor: 'text-sky-400',
+        valueColor: 'text-foreground',
       },
       {
         label: 'Виконано',
         value: String(s.completedOrders),
+        sub: 'Успішних замовлень',
         icon: CheckCircle2,
-        color: 'text-emerald-600',
-        bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-        accent: 'bg-emerald-400',
+        iconBg: 'bg-emerald-500/20',
+        iconColor: 'text-emerald-400',
+        valueColor: 'text-foreground',
       },
       {
         label: 'Скасовано',
         value: String(s.canceledOrders),
+        sub: 'Відмін за період',
         icon: XCircle,
-        color: 'text-red-500',
-        bg: 'bg-red-50 dark:bg-red-950/30',
-        accent: 'bg-red-400',
+        iconBg: 'bg-red-500/20',
+        iconColor: 'text-red-400',
+        valueColor: 'text-foreground',
       },
       {
         label: 'Сер. чек',
         value: fmt(s.avgOrderValue) + ' ₴',
+        sub: 'Середнє замовлення',
         icon: BarChart3,
-        color: 'text-amber-600',
-        bg: 'bg-amber-50 dark:bg-amber-950/30',
-        accent: 'bg-amber-400',
+        iconBg: 'bg-amber-500/20',
+        iconColor: 'text-amber-400',
+        valueColor: 'text-foreground',
       },
     ]
   })
@@ -268,7 +266,23 @@
     PAID: 'Оплачено',
   }
 
-  // ─── Експорт ────────────────────────────────────────────
+  // Іконка і колір рядка таблиці по статусу
+  function rowIcon(status: string): string {
+    if (status === 'COMPLETED') return '✓'
+    if (status === 'CANCELED') return '✕'
+    if (status === 'IN_PROGRESS') return '⟳'
+    if (status === 'CONFIRMED') return '◎'
+    return '○'
+  }
+  function rowIconBg(status: string): string {
+    if (status === 'COMPLETED') return 'bg-emerald-500/15 text-emerald-400'
+    if (status === 'CANCELED') return 'bg-red-500/15 text-red-400'
+    if (status === 'IN_PROGRESS') return 'bg-violet-500/15 text-violet-400'
+    if (status === 'CONFIRMED') return 'bg-sky-500/15 text-sky-400'
+    return 'bg-amber-500/15 text-amber-400'
+  }
+
+  // ─── Експорт DOCX (без змін) ────────────────────────────
   async function exportDocx() {
     if (!data) return
     exporting = true
@@ -288,7 +302,6 @@
         ShadingType,
         VerticalAlign,
       } = await import('docx')
-
       const s = data.summary
       const borderLight = {
         style: BorderStyle.SINGLE,
@@ -307,8 +320,7 @@
         left: borderLight,
         right: borderLight,
       }
-
-      const W = 14400 // A4 landscape content width DXA
+      const W = 14400
       const colW = [
         W * 0.05,
         W * 0.11,
@@ -320,7 +332,6 @@
         W * 0.11,
         W * 0.14,
       ].map(Math.round)
-
       function hCell(text: string, w: number) {
         return new TableCell({
           borders: headerBorders,
@@ -344,7 +355,6 @@
           ],
         })
       }
-
       function dCell(
         text: string,
         w: number,
@@ -366,7 +376,6 @@
           ],
         })
       }
-
       const doc = new Document({
         styles: {
           default: { document: { run: { font: 'Arial', size: 20 } } },
@@ -430,7 +439,6 @@
                 ],
                 spacing: { after: 400 },
               }),
-
               new Paragraph({
                 heading: HeadingLevel.HEADING_2,
                 children: [new TextRun('Зведені показники')],
@@ -509,9 +517,7 @@
                   }),
                 ],
               }),
-
               new Paragraph({ children: [], spacing: { before: 400 } }),
-
               ...(data.topCustomers.length > 0
                 ? [
                     new Paragraph({
@@ -548,7 +554,6 @@
                     new Paragraph({ children: [], spacing: { before: 400 } }),
                   ]
                 : []),
-
               new Paragraph({
                 heading: HeadingLevel.HEADING_2,
                 children: [new TextRun('Деталізація замовлень')],
@@ -637,7 +642,6 @@
                   }),
                 ],
               }),
-
               new Paragraph({
                 children: [
                   new TextRun({
@@ -655,8 +659,6 @@
           },
         ],
       })
-
-      // ✅ Packer.toBlob — правильний спосіб для браузера
       const blob = await Packer.toBlob(doc)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -692,7 +694,7 @@
 
 <!-- ══ КОНТЕНТ ════════════════════════════════════════════ -->
 <div class="space-y-6">
-  <!-- ── Хедер ──────────────────────────────────────────── -->
+  <!-- ── Хедер ── -->
   <div
     class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
   >
@@ -700,7 +702,6 @@
       <h1 class="text-2xl font-bold tracking-tight">Аналітика та фінанси</h1>
       <p class="text-sm text-muted-foreground mt-0.5">{periodLabel}</p>
     </div>
-
     <div class="flex flex-wrap items-center gap-2">
       <div class="flex rounded-lg border overflow-hidden shadow-sm">
         {#each [['week', 'Тиждень'], ['month', 'Місяць'], ['year', 'Рік']] as [val, label]}
@@ -709,14 +710,15 @@
               period = val as any
               load()
             }}
-            class="cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors
-              {period === val
+            class="cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors {period ===
+            val
               ? 'bg-primary text-primary-foreground'
-              : 'hover:bg-muted/60 text-muted-foreground'}">{label}</button
+              : 'hover:bg-muted/60 text-muted-foreground'}"
           >
+            {label}
+          </button>
         {/each}
       </div>
-
       {#if period !== 'week'}
         <div
           class="flex items-center gap-1 rounded-lg border overflow-hidden shadow-sm"
@@ -736,7 +738,6 @@
           >
         </div>
       {/if}
-
       <Button
         variant="outline"
         size="sm"
@@ -746,7 +747,6 @@
       >
         <RefreshCw class="h-3.5 w-3.5 {loading ? 'animate-spin' : ''}" />
       </Button>
-
       <Button
         size="sm"
         class="h-8 gap-1.5 cursor-pointer"
@@ -760,38 +760,44 @@
   </div>
 
   {#if data}
-    <!-- ── KPI картки ─────────────────────────────────────── -->
+    <!-- ════ KPI — СТИЛЬ ЯК НА СКРІНШОТАХ ════════════════ -->
+    <!-- Темні картки, велике число, підпис знизу, кольорова іконка -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       {#each kpis as kpi}
         <div
-          class="relative rounded-xl border bg-card shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
+          class="rounded-2xl bg-muted/60 dark:bg-card border border-border/50 p-4 flex flex-col gap-3 hover:bg-muted/80 dark:hover:bg-muted/20 transition-colors"
         >
-          <!-- Цветная полоска сверху -->
-          <div
-            class="absolute top-0 left-0 right-0 h-0.5 {kpi.accent} opacity-70 group-hover:opacity-100 transition-opacity"
-          ></div>
-          <div class="p-4 pt-5">
-            <div class="flex items-center justify-between mb-3">
-              <p
-                class="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
-              >
-                {kpi.label}
-              </p>
-              <div
-                class="h-8 w-8 rounded-lg {kpi.bg} flex items-center justify-center"
-              >
-                <svelte:component this={kpi.icon} class="h-4 w-4 {kpi.color}" />
-              </div>
+          <!-- Іконка -->
+          <div class="flex items-center justify-between">
+            <div
+              class="h-9 w-9 rounded-xl {kpi.iconBg} flex items-center justify-center shrink-0"
+            >
+              <svelte:component
+                this={kpi.icon}
+                class="h-4 w-4 {kpi.iconColor}"
+              />
             </div>
-            <p class="text-2xl font-bold tabular-nums {kpi.color} leading-none">
+          </div>
+          <!-- Число -->
+          <div>
+            <p
+              class="text-xl font-bold tabular-nums {kpi.valueColor} leading-tight"
+            >
               {kpi.value}
             </p>
+            <p class="text-xs text-muted-foreground mt-1">{kpi.sub}</p>
           </div>
+          <!-- Мітка -->
+          <p
+            class="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60"
+          >
+            {kpi.label}
+          </p>
         </div>
       {/each}
     </div>
 
-    <!-- ── Графік ──────────────────────────────────────────── -->
+    <!-- ── Графік (без змін) ──────────────────────────────── -->
     <Card.Root class="shadow-sm w-full">
       <Card.Header class="pb-2">
         <Card.Title class="text-base font-semibold flex items-center gap-2">
@@ -930,124 +936,150 @@
       </Card.Root>
     </div>
 
-    <!-- ── Таблиця замовлень ───────────────────────────────── -->
+    <!-- ════ ТАБЛИЦЯ — СТИЛЬ "RECENT TRANSACTIONS" ════════ -->
     <Card.Root class="shadow-sm overflow-hidden">
-      <Card.Header class="pb-3">
-        <Card.Title class="text-base font-semibold"
-          >Деталізація замовлень</Card.Title
+      <Card.Header class="pb-3 flex flex-row items-center justify-between">
+        <div>
+          <Card.Title class="text-base font-semibold"
+            >Транзакції замовлень</Card.Title
+          >
+          <Card.Description class="mt-1"
+            >Всі замовлення за {periodLabel.toLowerCase()}</Card.Description
+          >
+        </div>
+        <span
+          class="text-xs text-muted-foreground bg-muted/60 px-2.5 py-1 rounded-full font-medium"
         >
-        <Card.Description
-          >{data.orders.length} замовлень за період</Card.Description
-        >
+          {data.orders.length} записів
+        </span>
       </Card.Header>
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead>
-            <tr
-              class="bg-muted/50 text-muted-foreground text-xs uppercase tracking-wider border-b"
+
+      <div class="divide-y">
+        {#each data.orders as o}
+          <!-- Рядок у стилі банківської транзакції -->
+          <button
+            onclick={() => (window.location.href = `/orders/${o.id}`)}
+            class="cursor-pointer w-full flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors text-left group"
+          >
+            <!-- Іконка статусу -->
+            <div
+              class="h-10 w-10 rounded-xl {rowIconBg(
+                o.status,
+              )} flex items-center justify-center shrink-0 text-sm font-bold"
             >
-              <th class="text-left px-4 py-3 font-semibold">Дата</th>
-              <th class="text-left px-4 py-3 font-semibold">Клієнт</th>
-              <th class="text-left px-4 py-3 font-semibold">Статус</th>
-              <th class="text-left px-4 py-3 font-semibold">Оплата</th>
-              <th class="text-right px-4 py-3 font-semibold">Дохід</th>
-              <th class="text-right px-4 py-3 font-semibold">Витрати</th>
-              <th class="text-right px-4 py-3 font-semibold">ФОП</th>
-              <th class="text-right px-4 py-3 font-semibold">Клінери</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y">
-            {#each data.orders as o}
-              <tr
-                class="hover:bg-muted/30 transition-colors cursor-pointer group"
-                onclick={() => {
-                  window.location.href = `/orders/${o.id}`
-                }}
+              {rowIcon(o.status)}
+            </div>
+
+            <!-- Клієнт + адреса -->
+            <div class="flex-1 min-w-0">
+              <p
+                class="text-sm font-semibold truncate group-hover:text-primary transition-colors"
               >
-                <td
-                  class="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap"
-                  >{fmtDate(o.date)}</td
-                >
-                <td
-                  class="px-4 py-3 font-medium truncate max-w-[140px] group-hover:text-primary transition-colors"
-                  >{o.customer}</td
-                >
-                <td class="px-4 py-3">
-                  <span
-                    class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium
-                    {o.status === 'COMPLETED'
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30'
-                      : o.status === 'CANCELED'
-                        ? 'bg-red-50 text-red-600 dark:bg-red-950/30'
-                        : o.status === 'IN_PROGRESS'
-                          ? 'bg-violet-50 text-violet-700 dark:bg-violet-950/30'
-                          : o.status === 'CONFIRMED'
-                            ? 'bg-sky-50 text-sky-700 dark:bg-sky-950/30'
-                            : 'bg-amber-50 text-amber-700 dark:bg-amber-950/30'}"
-                  >
-                    {STATUS_UA[o.status] ?? o.status}
-                  </span>
-                </td>
-                <td class="px-4 py-3">
-                  <span
-                    class="text-xs font-medium
-                    {o.paymentStatus === 'PAID'
-                      ? 'text-emerald-600'
-                      : o.paymentStatus === 'PARTIALLY_PAID'
-                        ? 'text-amber-600'
-                        : 'text-red-500'}"
-                  >
-                    {PAYMENT_UA[o.paymentStatus] ?? o.paymentStatus}
-                  </span>
-                </td>
-                <td
-                  class="px-4 py-3 text-right font-bold tabular-nums {o.revenue >
-                  0
-                    ? 'text-emerald-600'
-                    : 'text-muted-foreground'}"
-                >
-                  {o.revenue > 0 ? fmt(o.revenue) + ' ₴' : '—'}
-                </td>
-                <td
-                  class="px-4 py-3 text-right tabular-nums {o.expenses > 0
-                    ? 'text-red-500'
-                    : 'text-muted-foreground'}"
-                >
-                  {o.expenses > 0 ? fmt(o.expenses) + ' ₴' : '—'}
-                </td>
-                <td
-                  class="px-4 py-3 text-right tabular-nums {o.payroll > 0
-                    ? 'text-violet-600'
-                    : 'text-muted-foreground'}"
-                >
-                  {o.payroll > 0 ? fmt(o.payroll) + ' ₴' : '—'}
-                </td>
-                <td class="px-4 py-3 text-right text-xs text-muted-foreground">
-                  {o.workers.length > 0
-                    ? o.workers.map((w) => w.split(' ')[0]).join(', ')
-                    : '—'}
-                </td>
-              </tr>
-            {/each}
-          </tbody>
-          <tfoot>
-            <tr class="bg-muted/50 font-bold text-sm border-t-2">
-              <td class="px-4 py-3 text-muted-foreground" colspan="4"
-                >Разом за період</td
+                {o.customer}
+              </p>
+              <p class="text-xs text-muted-foreground truncate">{o.address}</p>
+            </div>
+
+            <!-- Клінери -->
+            <div class="hidden md:block min-w-0 text-right mr-2">
+              <p class="text-xs text-muted-foreground">
+                {o.workers.length > 0
+                  ? o.workers.map((w) => w.split(' ')[0]).join(', ')
+                  : '—'}
+              </p>
+            </div>
+
+            <!-- Дата -->
+            <div class="hidden sm:block shrink-0 text-right mr-4">
+              <p class="text-xs text-muted-foreground whitespace-nowrap">
+                {fmtDate(o.date)}
+              </p>
+              <!-- Статус оплати -->
+              <p
+                class="text-[10px] font-medium mt-0.5
+                {o.paymentStatus === 'PAID'
+                  ? 'text-emerald-500'
+                  : o.paymentStatus === 'PARTIALLY_PAID'
+                    ? 'text-amber-500'
+                    : 'text-red-400'}"
               >
-              <td class="px-4 py-3 text-right tabular-nums text-emerald-600">
-                {fmt(data.orders.reduce((s, o) => s + o.revenue, 0))} ₴
-              </td>
-              <td class="px-4 py-3 text-right tabular-nums text-red-500">
-                {fmt(data.orders.reduce((s, o) => s + o.expenses, 0))} ₴
-              </td>
-              <td class="px-4 py-3 text-right tabular-nums text-violet-600">
-                {fmt(data.orders.reduce((s, o) => s + o.payroll, 0))} ₴
-              </td>
-              <td class="px-4 py-3"></td>
-            </tr>
-          </tfoot>
-        </table>
+                {PAYMENT_UA[o.paymentStatus] ?? o.paymentStatus}
+              </p>
+            </div>
+
+            <!-- Сума — як на скріншоті справа -->
+            <div class="shrink-0 text-right min-w-[80px]">
+              {#if o.revenue > 0}
+                <p class="text-sm font-bold text-emerald-500 tabular-nums">
+                  +{fmt(o.revenue)} ₴
+                </p>
+              {:else}
+                <p
+                  class="text-sm font-medium text-muted-foreground tabular-nums"
+                >
+                  —
+                </p>
+              {/if}
+              {#if o.expenses > 0 || o.payroll > 0}
+                <p class="text-[10px] text-red-400 tabular-nums mt-0.5">
+                  -{fmt(o.expenses + o.payroll)} ₴
+                </p>
+              {/if}
+            </div>
+
+            <!-- Три крапки (декоративно) -->
+            <div
+              class="shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="currentColor"
+              >
+                <circle cx="8" cy="3" r="1.2" /><circle
+                  cx="8"
+                  cy="8"
+                  r="1.2"
+                /><circle cx="8" cy="13" r="1.2" />
+              </svg>
+            </div>
+          </button>
+        {/each}
+      </div>
+
+      <!-- Підсумок -->
+      <div
+        class="flex items-center justify-between px-5 py-4 border-t bg-muted/20"
+      >
+        <span
+          class="text-xs font-semibold text-muted-foreground uppercase tracking-wider"
+          >Разом за {periodLabel.toLowerCase()}</span
+        >
+        <div class="flex items-center gap-6">
+          <div class="text-right">
+            <p
+              class="text-[10px] text-muted-foreground uppercase tracking-wider"
+            >
+              Дохід
+            </p>
+            <p class="text-sm font-bold text-emerald-500 tabular-nums">
+              +{fmt(data.orders.reduce((s, o) => s + o.revenue, 0))} ₴
+            </p>
+          </div>
+          <div class="text-right">
+            <p
+              class="text-[10px] text-muted-foreground uppercase tracking-wider"
+            >
+              Витрати + ФОП
+            </p>
+            <p class="text-sm font-bold text-red-400 tabular-nums">
+              -{fmt(
+                data.orders.reduce((s, o) => s + o.expenses + o.payroll, 0),
+              )} ₴
+            </p>
+          </div>
+        </div>
       </div>
     </Card.Root>
   {:else if !loading}
