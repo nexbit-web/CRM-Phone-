@@ -37,6 +37,7 @@
 //   await auth.api.createUser({
 //     body: {
 //       name: 'Микита',
+
 //       email: 'nik@crm.com',
 //       password: 'qwertyuiop2000',
 //       role: 'admin',
