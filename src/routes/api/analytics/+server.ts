@@ -14,8 +14,12 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }
 
   const period = url.searchParams.get('period') ?? 'month'
-  const year = parseInt(url.searchParams.get('year') ?? String(new Date().getFullYear()))
-  const month = parseInt(url.searchParams.get('month') ?? String(new Date().getMonth() + 1))
+  const year = parseInt(
+    url.searchParams.get('year') ?? String(new Date().getFullYear()),
+  )
+  const month = parseInt(
+    url.searchParams.get('month') ?? String(new Date().getMonth() + 1),
+  )
 
   // ─── Діапазон дат ───────────────────────────────────────
   let from: Date
@@ -106,15 +110,28 @@ export const GET: RequestHandler = async ({ request, url }) => {
   let inProgressOrders = 0
 
   for (const o of calc) {
-    totalRevenue += o.revenue
+    // Виручку рахуємо тільки для виконаних замовлень
+    if (o.status === 'COMPLETED') {
+      totalRevenue += o.revenue
+    }
     orderExpenses += o.expenses
     totalPayroll += o.payroll
     switch (o.status) {
-      case 'COMPLETED':   completedOrders++;  break
-      case 'CANCELED':    canceledOrders++;   break
-      case 'PENDING':     pendingOrders++;    break
-      case 'CONFIRMED':   confirmedOrders++;  break
-      case 'IN_PROGRESS': inProgressOrders++; break
+      case 'COMPLETED':
+        completedOrders++
+        break
+      case 'CANCELED':
+        canceledOrders++
+        break
+      case 'PENDING':
+        pendingOrders++
+        break
+      case 'CONFIRMED':
+        confirmedOrders++
+        break
+      case 'IN_PROGRESS':
+        inProgressOrders++
+        break
     }
   }
 
@@ -124,16 +141,26 @@ export const GET: RequestHandler = async ({ request, url }) => {
   const profit = totalRevenue - totalExpenses - totalPayroll
 
   // ─── Динаміка по місяцях ────────────────────────────────
-  const monthlyMap: Record<string, { revenue: number; expenses: number; orders: number }> = {}
+  const monthlyMap: Record<
+    string,
+    { revenue: number; expenses: number; orders: number }
+  > = {}
   for (let m = 1; m <= 12; m++) {
-    monthlyMap[`${year}-${String(m).padStart(2, '0')}`] = { revenue: 0, expenses: 0, orders: 0 }
+    monthlyMap[`${year}-${String(m).padStart(2, '0')}`] = {
+      revenue: 0,
+      expenses: 0,
+      orders: 0,
+    }
   }
 
   for (const o of calc) {
     const slot = monthlyMap[o.monthKey]
     if (slot) {
       slot.orders++
-      slot.revenue += o.revenue
+      // Виручку по місяцях теж тільки для виконаних
+      if (o.status === 'COMPLETED') {
+        slot.revenue += o.revenue
+      }
       slot.expenses += o.expenses
     }
   }
@@ -145,15 +172,25 @@ export const GET: RequestHandler = async ({ request, url }) => {
   }))
 
   // ─── Топ клієнти ────────────────────────────────────────
-  const customerMap = new Map<string, { name: string; orders: number; revenue: number }>()
+  const customerMap = new Map<
+    string,
+    { name: string; orders: number; revenue: number }
+  >()
 
   for (const o of calc) {
     const existing = customerMap.get(o.customerId)
     if (existing) {
       existing.orders++
-      existing.revenue += o.revenue
+      // Виручку для топ клієнтів теж тільки для виконаних
+      if (o.status === 'COMPLETED') {
+        existing.revenue += o.revenue
+      }
     } else {
-      customerMap.set(o.customerId, { name: o.customerName, orders: 1, revenue: o.revenue })
+      customerMap.set(o.customerId, {
+        name: o.customerName,
+        orders: 1,
+        revenue: o.status === 'COMPLETED' ? o.revenue : 0,
+      })
     }
   }
 
@@ -179,28 +216,28 @@ export const GET: RequestHandler = async ({ request, url }) => {
       totalExpenses,
       totalPayroll,
       profit,
-      avgOrderValue: totalOrders > 0 ? totalRevenue / totalOrders : 0,
+      avgOrderValue: completedOrders > 0 ? totalRevenue / completedOrders : 0,
     },
     monthly,
     topCustomers,
     statusBreakdown: {
-      PENDING:     pendingOrders,
-      CONFIRMED:   confirmedOrders,
+      PENDING: pendingOrders,
+      CONFIRMED: confirmedOrders,
       IN_PROGRESS: inProgressOrders,
-      COMPLETED:   completedOrders,
-      CANCELED:    canceledOrders,
+      COMPLETED: completedOrders,
+      CANCELED: canceledOrders,
     },
     orders: calc.map((o) => ({
-      id:            o.id,
-      date:          o.date,
-      status:        o.status,
+      id: o.id,
+      date: o.date,
+      status: o.status,
       paymentStatus: o.paymentStatus,
-      customer:      o.customerName,
-      address:       o.address,
-      revenue:       o.revenue,
-      expenses:      o.expenses,
-      payroll:       o.payroll,
-      workers:       o.workers,
+      customer: o.customerName,
+      address: o.address,
+      revenue: o.revenue,
+      expenses: o.expenses,
+      payroll: o.payroll,
+      workers: o.workers,
     })),
   })
 }
