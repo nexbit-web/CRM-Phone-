@@ -20,7 +20,9 @@
     BarChart3,
     ArrowUpRight,
     ArrowDownRight,
+    EllipsisVertical,
   } from 'lucide-svelte'
+  import { Spinner } from '$lib/components/ui/spinner'
 
   type Summary = {
     totalOrders: number
@@ -675,23 +677,6 @@
   }
 </script>
 
-<!-- ══ SPINNER ═══════════════════════════════════════════ -->
-{#if loading}
-  <div
-    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm"
-  >
-    <div class="relative">
-      <div class="h-14 w-14 rounded-full border-4 border-muted"></div>
-      <div
-        class="absolute inset-0 h-14 w-14 animate-spin rounded-full border-4 border-primary border-t-transparent"
-      ></div>
-    </div>
-    <p class="mt-4 text-sm font-medium text-muted-foreground animate-pulse">
-      Завантаження аналітики...
-    </p>
-  </div>
-{/if}
-
 <!-- ══ КОНТЕНТ ════════════════════════════════════════════ -->
 <div class="space-y-6">
   <!-- ── Хедер ── -->
@@ -758,8 +743,15 @@
       </Button>
     </div>
   </div>
-
-  {#if data}
+  {#if loading}
+    <!-- Только лоадер, ничего больше не рендерится -->
+    <div class="absolute inset-0 z-50 flex items-center justify-center">
+      <div class="flex flex-col items-center gap-3">
+        <Spinner class="h-8 w-8" />
+        <p class="text-sm font-medium text-muted-foreground">Завантаження...</p>
+      </div>
+    </div>
+  {:else if data}
     <!-- ════ KPI — СТИЛЬ ЯК НА СКРІНШОТАХ ════════════════ -->
     <!-- Темні картки, велике число, підпис знизу, кольорова іконка -->
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -1031,18 +1023,7 @@
             <div
               class="shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground transition-colors"
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="currentColor"
-              >
-                <circle cx="8" cy="3" r="1.2" /><circle
-                  cx="8"
-                  cy="8"
-                  r="1.2"
-                /><circle cx="8" cy="13" r="1.2" />
-              </svg>
+              <EllipsisVertical />
             </div>
           </button>
         {/each}
